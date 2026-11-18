@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoCare — Layanan Servis Kendaraan Panggil ke Rumah</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            canvas: '#F7F6F2',
+            hairline: '#E6E4DD',
+            ink: '#141518',
+            muted: '#646460',
+            forest: '#0F766E',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      /* Fluid Typographic Scale (Native Viewport Responsive) */
+      --text-display: clamp(1.45rem, 2.6vw + 0.7rem, 2rem);
+      --text-h1: clamp(1.3rem, 1.8vw + 0.75rem, 1.75rem);
+      --text-h2: clamp(1.05rem, 1vw + 0.75rem, 1.35rem);
+      --text-h3: clamp(0.925rem, 0.5vw + 0.78rem, 1.0625rem);
+      --text-body: clamp(0.8125rem, 0.25vw + 0.75rem, 0.9375rem);
+      --text-sm: clamp(0.75rem, 0.2vw + 0.7rem, 0.84rem);
+      --text-xs: clamp(0.6875rem, 0.15vw + 0.64rem, 0.75rem);
+      --text-price-lg: clamp(1.25rem, 1.4vw + 0.85rem, 1.75rem);
+      --text-price-md: clamp(0.95rem, 0.6vw + 0.78rem, 1.15rem);
+      --text-nav: 0.75rem;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #ECEAE2;
+      color: #141518;
+      margin: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* =========================================================================
+       FLUID & MODE-AWARE TYPOGRAPHY UTILITIES
+       ========================================================================= */
+    .t-display {
+      font-size: var(--text-display);
+      line-height: 1.18;
+      letter-spacing: -0.025em;
+    }
+    .t-h1 {
+      font-size: var(--text-h1);
+      line-height: 1.22;
+      letter-spacing: -0.02em;
+    }
+    .t-h2 {
+      font-size: var(--text-h2);
+      line-height: 1.28;
+      letter-spacing: -0.015em;
+    }
+    .t-h3 {
+      font-size: var(--text-h3);
+      line-height: 1.35;
+      letter-spacing: -0.01em;
+    }
+    .t-body {
+      font-size: var(--text-body);
+      line-height: 1.55;
+    }
+    .t-sm {
+      font-size: var(--text-sm);
+      line-height: 1.45;
+    }
+    .t-xs {
+      font-size: var(--text-xs);
+      line-height: 1.4;
+    }
+    .t-price-lg {
+      font-size: var(--text-price-lg);
+      line-height: 1.15;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+    .t-price-md {
+      font-size: var(--text-price-md);
+      line-height: 1.2;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.01em;
+    }
+    .t-nav {
+      font-size: var(--text-nav);
+      line-height: 1.2;
+    }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* =========================================================================
+       TRUE RESPONSIVE DEVICE FRAME ENGINE (DESKTOP / TABLET / MOBILE)
+       ========================================================================= */
+    #device-frame {
+      transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-radius 0.3s ease;
+    }
+
+    #device-frame.mode-desktop {
+      width: 100%;
+      max-width: 1180px;
+      --text-display: 2rem;      /* 32px */
+      --text-h1: 1.625rem;       /* 26px */
+      --text-h2: 1.25rem;        /* 20px */
+      --text-h3: 1.03125rem;     /* 16.5px */
+      --text-body: 0.90625rem;   /* 14.5px */
+      --text-sm: 0.8125rem;      /* 13px */
+      --text-xs: 0.75rem;        /* 12px */
+      --text-price-lg: 1.625rem; /* 26px */
+      --text-price-md: 1.0625rem;/* 17px */
+      --text-nav: 0.8125rem;     /* 13px */
+    }
+
+    #device-frame.mode-tablet {
+      width: 768px;
+      max-width: 100%;
+      --text-display: 1.6875rem; /* 27px */
+      --text-h1: 1.4375rem;      /* 23px */
+      --text-h2: 1.15625rem;     /* 18.5px */
+      --text-h3: 0.96875rem;     /* 15.5px */
+      --text-body: 0.875rem;     /* 14px */
+      --text-sm: 0.78125rem;     /* 12.5px */
+      --text-xs: 0.71875rem;     /* 11.5px */
+      --text-price-lg: 1.4375rem;/* 23px */
+      --text-price-md: 1rem;     /* 16px */
+      --text-nav: 0.75rem;       /* 12px */
+    }
+    #device-frame.mode-tablet .desktop-only-sidebar {
+      display: none !important;
+    }
+    #device-frame.mode-tablet .mobile-tablet-header {
+      display: flex !important;
+    }
+    #device-frame.mode-tablet .mobile-tablet-bottom-nav {
+      display: grid !important;
+    }
+    #device-frame.mode-tablet .login-split {
+      flex-direction: column !important;
+    }
+    #device-frame.mode-tablet .login-hero {
+      display: none !important;
+    }
+    #device-frame.mode-tablet .responsive-grid-split {
+      grid-template-columns: 1fr !important;
+    }
+
+    #device-frame.mode-mobile {
+      width: 390px;
+      max-width: 100%;
+      border-radius: 2.25rem;
+      --text-display: 1.375rem;  /* 22px */
+      --text-h1: 1.25rem;        /* 20px */
+      --text-h2: 1.03125rem;     /* 16.5px */
+      --text-h3: 0.90625rem;     /* 14.5px */
+      --text-body: 0.8125rem;    /* 13px */
+      --text-sm: 0.75rem;        /* 12px */
+      --text-xs: 0.6875rem;      /* 11px */
+      --text-price-lg: 1.25rem;  /* 20px */
+      --text-price-md: 0.9375rem;/* 15px */
+      --text-nav: 0.6875rem;     /* 11px */
+    }
+    #device-frame.mode-mobile .desktop-only-sidebar {
+      display: none !important;
+    }
+    #device-frame.mode-mobile .mobile-tablet-header {
+      display: flex !important;
+    }
+    #device-frame.mode-mobile .mobile-tablet-bottom-nav {
+      display: grid !important;
+    }
+    #device-frame.mode-mobile .login-split {
+      flex-direction: column !important;
+    }
+    #device-frame.mode-mobile .login-hero {
+      display: none !important;
+    }
+    #device-frame.mode-mobile .responsive-grid-2,
+    #device-frame.mode-mobile .responsive-grid-3,
+    #device-frame.mode-mobile .responsive-grid-4,
+    #device-frame.mode-mobile .responsive-grid-split {
+      grid-template-columns: 1fr !important;
+    }
+    #device-frame.mode-mobile .hero-banner-flex {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+    }
+    #device-frame.mode-mobile .app-section-pad {
+      padding: 1rem !important;
+    }
+    #device-frame.mode-mobile .card-pad {
+      padding: 1rem !important;
+    }
+
+    /* Otomatis layar penuh & hilangkan toolbar saat dibuka di HP asli */
+    @media (max-width: 640px) {
+      #studio-toolbar {
+        display: none !important;
+      }
+      #canvas-wrapper {
+        padding: 0 !important;
+      }
+      #device-frame {
+        width: 100% !important;
+        max-width: 100% !important;
+        border-radius: 0 !important;
+        border: none !important;
+        min-height: 100vh !important;
+        --text-display: 1.375rem;
+        --text-h1: 1.25rem;
+        --text-h2: 1.03125rem;
+        --text-h3: 0.90625rem;
+        --text-body: 0.8125rem;
+        --text-sm: 0.75rem;
+        --text-xs: 0.6875rem;
+        --text-price-lg: 1.25rem;
+        --text-price-md: 0.9375rem;
+        --text-nav: 0.6875rem;
+      }
+      #device-frame .desktop-only-sidebar {
+        display: none !important;
+      }
+      #device-frame .mobile-tablet-header {
+        display: flex !important;
+      }
+      #device-frame .mobile-tablet-bottom-nav {
+        display: grid !important;
+      }
+      #device-frame .login-hero {
+        display: none !important;
+      }
+      #device-frame .responsive-grid-2,
+      #device-frame .responsive-grid-3,
+      #device-frame .responsive-grid-4,
+      #device-frame .responsive-grid-split {
+        grid-template-columns: 1fr !important;
+      }
+      #device-frame .hero-banner-flex {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+      }
+      #device-frame .app-section-pad {
+        padding: 1rem !important;
+      }
+    }
+
+    /* Apple-Maps Inspired Clean Vector Map Background */
+    .vector-map-bg {
+      background-color: #F3F1EC;
+      background-image:
+        linear-gradient(to right, rgba(226, 223, 214, 0.7) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(226, 223, 214, 0.7) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    .page-enter {
+      animation: pageEnter 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes pageEnter {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- ===================================================================== -->
+  <!-- TOP PROTOTYPE BAR (Clean Warm Neutral Bar)                            -->
+  <!-- ===================================================================== -->
+  <header id="studio-toolbar" class="sticky top-0 z-50 bg-[#141518] text-white border-b border-white/10">
+    <div class="max-w-[1360px] mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+      <!-- Brand -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-white text-[#141518] flex items-center justify-center shrink-0">
+          <i data-lucide="wrench" class="w-4 h-4"></i>
+        </div>
+        <div>
+          <span class="font-bold text-sm tracking-tight block leading-none">AutoCare</span>
+          <span class="text-[11px] text-neutral-400">On-Demand Auto Care • Bandar Lampung</span>
+        </div>
+      </div>
+
+      <!-- Device Switcher -->
+      <div id="viewport-switcher" class="flex items-center bg-white/10 p-1 rounded-xl" role="group" aria-label="Pilih Ukuran Layar">
+        <button type="button" onclick="setDeviceMode('desktop')" id="btn-vp-desktop"
+          class="vp-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-[#141518] shadow-xs transition">
+          <i data-lucide="monitor" class="w-3.5 h-3.5"></i>
+          <span>Desktop</span>
+        </button>
+        <button type="button" onclick="setDeviceMode('tablet')" id="btn-vp-tablet"
+          class="vp-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-neutral-300 hover:text-white transition">
+          <i data-lucide="tablet" class="w-3.5 h-3.5"></i>
+          <span>Tablet</span>
+        </button>
+        <button type="button" onclick="setDeviceMode('mobile')" id="btn-vp-mobile"
+          class="vp-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-neutral-300 hover:text-white transition">
+          <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
+          <span>HP</span>
+        </button>
+      </div>
+
+      <!-- Mode Switcher (Prototype vs Design System) -->
+      <div class="flex items-center bg-white/10 p-1 rounded-xl">
+        <button type="button" onclick="setStudioTab('prototype')" id="tab-prototype"
+          class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white text-[#141518] shadow-xs transition">
+          Prototype
+        </button>
+        <button type="button" onclick="setStudioTab('design-system')" id="tab-ds"
+          class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-neutral-300 hover:text-white transition">
+          Design System
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 1: INTERACTIVE PROTOTYPE CANVAS                                  -->
+  <!-- ===================================================================== -->
+  <main id="canvas-wrapper" class="flex-1 flex flex-col items-center justify-start py-4 sm:py-6 px-3 sm:px-5 overflow-x-hidden">
+
+    <div id="device-frame" class="mode-desktop bg-canvas rounded-3xl shadow-[0_20px_50px_rgba(20,21,24,0.12)] border border-[#D8D5CC] overflow-hidden flex flex-col min-h-[680px]">
+
+      <!-- ================================================================= -->
+      <!-- SCREEN 1: LOGIN                                                   -->
+      <!-- ================================================================= -->
+      <section id="screen-login" class="login-split flex-1 flex flex-col lg:flex-row bg-white page-enter">
+        <!-- Editorial Left Panel -->
+        <div class="login-hero hidden lg:flex lg:w-5/12 bg-[#141518] text-white p-10 flex-col justify-between relative overflow-hidden">
+          <div class="space-y-5">
+            <div class="inline-flex items-center gap-2 bg-white/10 border border-white/15 text-neutral-200 px-3.5 py-1.5 rounded-full t-xs font-medium">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span>Mekanik Tersertifikasi • Harga Jelas di Awal</span>
+            </div>
+            <h1 class="t-display font-extrabold text-white">
+              Rawat kendaraan di rumah tanpa antre bengkel.
+            </h1>
+            <p class="t-body text-neutral-400">
+              Panggil mekanik langsung ke rumah atau kosan. Cek rincian jasa dan sparepart sebelum berangkat, pantau lokasi teknisi secara langsung, dan terima bukti foto pengerjaan.
+            </p>
+          </div>
+
+          <!-- Customer Review Card -->
+          <div class="bg-white/[0.06] border border-white/10 rounded-2xl p-5 space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold t-sm shrink-0">RS</div>
+                <div class="min-w-0">
+                  <p class="t-sm font-bold text-white truncate">Rian Saputra</p>
+                  <p class="t-xs text-neutral-400 font-mono truncate">Honda Vario 150 • BE 1234 XX</p>
+                </div>
+              </div>
+              <span class="text-amber-400 t-xs font-bold tracking-wider shrink-0">★★★★★</span>
+            </div>
+            <p class="t-xs text-neutral-300 leading-relaxed">
+              "Praktis banget buat yang sibuk kuliah & kerja. Rincian harga jasa sama olinya sudah transparan di awal sebelum mekanik jalan."
+            </p>
+          </div>
+        </div>
+
+        <!-- Form Login Kanan -->
+        <div class="flex-1 flex items-center justify-center p-5 sm:p-10 bg-canvas">
+          <div class="w-full max-w-md bg-white rounded-3xl border border-hairline p-6 sm:p-8 shadow-2xs">
+            <div class="mb-6">
+              <div class="w-12 h-12 rounded-2xl bg-[#141518] text-white flex items-center justify-center mb-4">
+                <i data-lucide="wrench" class="w-5 h-5"></i>
+              </div>
+              <h2 class="t-h1 font-extrabold text-ink">Masuk ke AutoCare</h2>
+              <p class="t-sm text-muted mt-1">Pesan servis kendaraan panggilan langsung ke lokasi Anda</p>
+            </div>
+
+            <!-- Akun Demo 1-Klik -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-5">
+              <button type="button" onclick="quickFill('user1', 'user1')"
+                class="py-2.5 px-3 rounded-xl bg-canvas hover:bg-[#ECEAE2] border border-hairline text-ink t-xs font-bold transition flex items-center justify-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-[#141518] shrink-0"></span>
+                <span>Pelanggan (user1)</span>
+              </button>
+              <button type="button" onclick="quickFill('admin', 'admin')"
+                class="py-2.5 px-3 rounded-xl bg-emerald-50/70 hover:bg-emerald-100/70 border border-emerald-200 text-emerald-900 t-xs font-bold transition flex items-center justify-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-600 shrink-0"></span>
+                <span>Mekanik (admin)</span>
+              </button>
+            </div>
+
+            <form onsubmit="submitLogin(event)" class="space-y-4">
+              <div>
+                <label for="login-user" class="block t-xs font-bold text-ink mb-1.5">Username atau Email</label>
+                <input id="login-user" type="text" value="user1" placeholder="Masukkan username" required
+                  class="w-full px-3.5 py-2.5 t-body bg-canvas border border-hairline rounded-xl text-ink focus:outline-none focus:border-ink focus:bg-white transition" />
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label for="login-pass" class="t-xs font-bold text-ink">Kata Sandi</label>
+                  <span class="t-xs font-semibold text-muted hover:text-ink cursor-pointer">Lupa kata sandi?</span>
+                </div>
+                <div class="relative">
+                  <input id="login-pass" type="password" value="user1" placeholder="Masukkan kata sandi" required
+                    class="w-full pl-3.5 pr-16 py-2.5 t-body bg-canvas border border-hairline rounded-xl text-ink focus:outline-none focus:border-ink focus:bg-white transition" />
+                  <button type="button" onclick="togglePasswordVisibility()" id="btn-show-pass"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 t-xs font-bold text-muted hover:text-ink">
+                    Lihat
+                  </button>
+                </div>
+              </div>
+
+              <div id="login-alert" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 t-xs font-semibold flex items-center gap-2">
+                <i data-lucide="alert-circle" class="w-4 h-4 shrink-0 text-amber-700"></i>
+                <span>Gunakan <strong>user1 / user1</strong> atau <strong>admin / admin</strong>.</span>
+              </div>
+
+              <button type="submit"
+                class="w-full py-3 rounded-xl bg-[#141518] hover:bg-neutral-800 text-white font-bold t-sm transition flex items-center justify-center gap-2">
+                <span>Masuk</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
+            </form>
+
+            <div class="mt-5 pt-4 border-t border-hairline text-center">
+              <p class="t-xs text-muted">
+                Belum punya akun? <span class="font-bold text-ink cursor-pointer hover:underline">Daftar sekarang</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- SCREEN 2: PORTAL PELANGGAN (Rian Saputra - user1)                 -->
+      <!-- ================================================================= -->
+      <div id="screen-customer" class="hidden flex-1 flex flex-col lg:flex-row relative">
+
+        <!-- Sidebar Navigasi (Desktop) -->
+        <aside class="desktop-only-sidebar hidden lg:flex lg:w-60 bg-white border-r border-hairline p-5 flex-col justify-between shrink-0">
+          <div class="space-y-6">
+            <div class="flex items-center gap-2.5 px-1">
+              <div class="w-9 h-9 rounded-xl bg-[#141518] text-white flex items-center justify-center shrink-0">
+                <i data-lucide="wrench" class="w-4 h-4"></i>
+              </div>
+              <div class="min-w-0">
+                <h2 class="t-sm font-extrabold text-ink leading-tight truncate">AutoCare</h2>
+                <span class="t-xs text-muted block truncate">Servis Panggil ke Rumah</span>
+              </div>
+            </div>
+
+            <nav class="space-y-1">
+              <button type="button" onclick="navigateCustomer('home')" data-nav="home"
+                class="side-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl t-nav font-bold bg-[#141518] text-white transition">
+                <i data-lucide="home" class="w-4 h-4 shrink-0"></i>
+                <span>Beranda</span>
+              </button>
+              <button type="button" onclick="navigateCustomer('order')" data-nav="order"
+                class="side-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl t-nav font-semibold text-muted hover:text-ink hover:bg-canvas transition">
+                <i data-lucide="calendar-plus" class="w-4 h-4 shrink-0"></i>
+                <span>Pesan Servis</span>
+              </button>
+              <button type="button" onclick="navigateCustomer('tracking')" data-nav="tracking"
+                class="side-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl t-nav font-semibold text-muted hover:text-ink hover:bg-canvas transition">
+                <i data-lucide="navigation" class="w-4 h-4 shrink-0"></i>
+                <span>Lacak & Progres</span>
+              </button>
+              <button type="button" onclick="navigateCustomer('invoice')" data-nav="invoice"
+                class="side-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl t-nav font-semibold text-muted hover:text-ink hover:bg-canvas transition">
+                <i data-lucide="receipt" class="w-4 h-4 shrink-0"></i>
+                <span>Invoice & Ulasan</span>
+              </button>
+            </nav>
+          </div>
+
+          <!-- Profil Mini Rian Saputra -->
+          <div class="pt-4 border-t border-hairline space-y-3">
+            <div class="bg-canvas p-3 rounded-2xl border border-hairline flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-full bg-emerald-700 text-white font-bold t-xs flex items-center justify-center shrink-0">RS</div>
+              <div class="min-w-0">
+                <p class="t-xs font-bold text-ink truncate">Rian Saputra</p>
+                <p class="t-xs font-mono text-muted truncate">BE 1234 XX</p>
+              </div>
+            </div>
+            <button type="button" onclick="logoutApp()"
+              class="w-full py-2.5 px-3 rounded-xl bg-canvas hover:bg-[#ECEAE2] border border-hairline text-ink t-xs font-bold flex items-center justify-center gap-2 transition">
+              <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+              <span>Keluar</span>
+            </button>
+          </div>
+        </aside>
+
+        <!-- Konten Utama Pelanggan -->
+        <div class="flex-1 flex flex-col min-w-0 bg-canvas">
+
+          <!-- Header Atas untuk Tablet & HP -->
+          <div class="mobile-tablet-header hidden lg:hidden w-full bg-white border-b border-hairline px-4 py-3 items-center justify-between gap-2 sticky top-0 z-20">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-8 h-8 rounded-xl bg-[#141518] text-white flex items-center justify-center shrink-0">
+                <i data-lucide="wrench" class="w-4 h-4"></i>
+              </div>
+              <div class="min-w-0">
+                <span class="t-sm font-extrabold text-ink block leading-none truncate">AutoCare</span>
+                <span class="t-xs text-muted block mt-0.5 truncate">Rajabasa, Bandar Lampung</span>
+              </div>
+            </div>
+            <button type="button" onclick="logoutApp()"
+              class="px-3 py-1.5 rounded-xl bg-canvas hover:bg-[#ECEAE2] border border-hairline text-ink t-xs font-bold flex items-center gap-1.5 shrink-0 transition">
+              <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+              <span>Keluar</span>
+            </button>
+          </div>
+
+          <!-- --------------------------------------------------------------- -->
+          <!-- HALAMAN A: BERANDA PELANGGAN                                    -->
+          <!-- --------------------------------------------------------------- -->
+          <div id="cview-home" class="cview app-section-pad p-5 sm:p-6 space-y-5 page-enter">
+            <!-- Greeting & CTA Card -->
+            <div class="card-pad bg-white rounded-3xl p-5 sm:p-6 border border-hairline">
+              <div class="hero-banner-flex flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="space-y-1.5 min-w-0">
+                  <div class="inline-flex items-center gap-1.5 t-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0"></span>
+                    <span>Mekanik tersedia di sekitar Rajabasa</span>
+                  </div>
+                  <h1 class="t-display font-extrabold text-ink pt-1 break-words">Halo, Rian Saputra</h1>
+                  <p class="t-sm text-muted flex items-start gap-1.5">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5 text-ink shrink-0 mt-1"></i>
+                    <span>Jl. ZA Pagar Alam No. 45, Rajabasa, Bandar Lampung</span>
+                  </p>
+                </div>
+                <button type="button" onclick="navigateCustomer('order')"
+                  class="px-5 py-3 rounded-xl bg-[#141518] hover:bg-neutral-800 text-white font-bold t-sm transition flex items-center gap-2 shrink-0">
+                  <i data-lucide="calendar-plus" class="w-4 h-4"></i>
+                  <span>Pesan Servis Sekarang</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Baris Info: Kendaraan Terdaftar & Pesanan Aktif -->
+            <div class="responsive-grid-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Kartu Kendaraan Bergaya STNK/Pelat Nomor -->
+              <div class="card-pad bg-white rounded-2xl p-4 sm:p-5 border border-hairline flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3.5 min-w-0">
+                  <div class="w-11 h-11 rounded-2xl bg-canvas border border-hairline text-ink flex items-center justify-center shrink-0">
+                    <i data-lucide="bike" class="w-5 h-5"></i>
+                  </div>
+                  <div class="min-w-0">
+                    <div class="flex flex-wrap items-center gap-1.5">
+                      <span class="t-xs font-mono font-bold bg-[#141518] text-white px-2 py-0.5 rounded tabular-nums">BE 1234 XX</span>
+                      <span class="t-xs text-muted">2021 • 150cc</span>
+                    </div>
+                    <h3 class="t-h3 font-extrabold text-ink truncate mt-1">Honda Vario 150</h3>
+                    <p class="t-xs text-muted">Transmisi Matic • Tersimpan</p>
+                  </div>
+                </div>
+                <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 t-xs font-bold shrink-0">
+                  Aktif
+                </span>
+              </div>
+
+              <!-- Kartu Pesanan Berjalan -->
+              <div class="card-pad bg-[#141518] text-white rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-3">
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+                    <span class="t-xs font-semibold text-neutral-300">Pesanan Berjalan</span>
+                  </div>
+                  <h3 class="t-h3 font-extrabold text-white mt-1 truncate">Budi Santoso (★ 4.8)</h3>
+                  <p class="t-xs text-neutral-400">Menuju lokasi • Estimasi 8 menit</p>
+                </div>
+                <button type="button" onclick="navigateCustomer('tracking')"
+                  class="px-3.5 py-2 rounded-xl bg-white hover:bg-neutral-200 text-ink t-xs font-bold transition shrink-0">
+                  Lacak Peta →
+                </button>
+              </div>
+            </div>
+
+            <!-- Pilihan Paket Layanan Servis -->
+            <div class="space-y-3">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <h2 class="t-h2 font-extrabold text-ink">Pilih Paket Layanan Servis</h2>
+                <span class="t-xs text-muted">Estimasi harga jasa & oli tampil di awal</span>
+              </div>
+
+              <div class="responsive-grid-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                <!-- Paket 1 (Rekomendasi Utama sesuai Skenario Rian) -->
+                <div onclick="selectServicePackage('Ganti Oli Mesin + Servis Ringan Transmisi', 'Pembersihan CVT, cek oli gardan, kalibrasi injeksi & ganti oli MPX2.', '~45 Menit', 50000, 65000)"
+                  class="card-pad cursor-pointer bg-white border-2 border-[#141518] rounded-2xl p-4 transition flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between mb-3">
+                      <div class="w-9 h-9 rounded-xl bg-canvas border border-hairline text-ink flex items-center justify-center shrink-0">
+                        <i data-lucide="droplet" class="w-4 h-4"></i>
+                      </div>
+                      <span class="t-xs font-bold bg-[#141518] text-white px-2.5 py-0.5 rounded-full">Populer</span>
+                    </div>
+                    <h3 class="t-h3 font-extrabold text-ink">Ganti Oli & Servis Ringan</h3>
+                    <p class="t-sm text-muted mt-1.5">Oli MPX2 0.8L, pembersihan CVT, cek oli gardan & injeksi.</p>
+                  </div>
+                  <div class="mt-4 pt-3 border-t border-hairline flex items-center justify-between gap-2">
+                    <span class="t-price-md font-extrabold font-mono text-ink">Rp 115.000</span>
+                    <span class="t-xs font-bold text-ink shrink-0">Pilih →</span>
+                  </div>
+                </div>
+
+                <!-- Paket 2 -->
+                <div onclick="selectServicePackage('Servis Rutin Berkala', 'Inspeksi 20 titik standar, penyetelan rem depan-belakang, dan pembersihan filter udara.', '~60 Menit', 60000, 35000)"
+                  class="card-pad cursor-pointer bg-white hover:border-[#141518] border border-hairline rounded-2xl p-4 transition flex flex-col justify-between">
+                  <div>
+                    <div class="w-9 h-9 rounded-xl bg-canvas border border-hairline text-ink flex items-center justify-center mb-3">
+                      <i data-lucide="shield-check" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="t-h3 font-extrabold text-ink">Servis Rutin</h3>
+                    <p class="t-sm text-muted mt-1.5">Pengecekan 20 titik standar, setel rem & filter udara.</p>
+                  </div>
+                  <div class="mt-4 pt-3 border-t border-hairline flex items-center justify-between gap-2">
+                    <span class="t-price-md font-extrabold font-mono text-ink">Rp 95.000</span>
+                    <span class="t-xs font-bold text-muted shrink-0">Pilih →</span>
+                  </div>
+                </div>
+
+                <!-- Paket 3 -->
+                <div onclick="selectServicePackage('Cek Aki & Kelistrikan', 'Pengukuran tegangan aki digital, pengecekan sekring, kiprok, dan sistem pengapian.', '~30 Menit', 35000, 15000)"
+                  class="card-pad cursor-pointer bg-white hover:border-[#141518] border border-hairline rounded-2xl p-4 transition flex flex-col justify-between">
+                  <div>
+                    <div class="w-9 h-9 rounded-xl bg-canvas border border-hairline text-ink flex items-center justify-center mb-3">
+                      <i data-lucide="zap" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="t-h3 font-extrabold text-ink">Cek Aki & Kelistrikan</h3>
+                    <p class="t-sm text-muted mt-1.5">Tes voltase aki, sekring, kiprok & sistem pengapian.</p>
+                  </div>
+                  <div class="mt-4 pt-3 border-t border-hairline flex items-center justify-between gap-2">
+                    <span class="t-price-md font-extrabold font-mono text-ink">Rp 50.000</span>
+                    <span class="t-xs font-bold text-muted shrink-0">Pilih →</span>
+                  </div>
+                </div>
+
+                <!-- Paket 4 -->
+                <div onclick="selectServicePackage('Tune Up Performa Mesin', 'Pembersihan throttle body, ruang bakar, busi baru & kalibrasi tarikan mesin.', '~75 Menit', 85000, 75000)"
+                  class="card-pad cursor-pointer bg-white hover:border-[#141518] border border-hairline rounded-2xl p-4 transition flex flex-col justify-between">
+                  <div>
+                    <div class="w-9 h-9 rounded-xl bg-canvas border border-hairline text-ink flex items-center justify-center mb-3">
+                      <i data-lucide="gauge" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="t-h3 font-extrabold text-ink">Tune Up Mesin</h3>
+                    <p class="t-sm text-muted mt-1.5">Throttle body, ganti busi baru & kalibrasi performa.</p>
+                  </div>
+                  <div class="mt-4 pt-3 border-t border-hairline flex items-center justify-between gap-2">
+                    <span class="t-price-md font-extrabold font-mono text-ink">Rp 160.000</span>
+                    <span class="t-xs font-bold text-muted shrink-0">Pilih →</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- --------------------------------------------------------------- -->
+          <!-- HALAMAN B: FORM PEMESANAN & ESTIMASI BIAYA                      -->
+          <!-- --------------------------------------------------------------- -->
+          <div id="cview-order" class="cview hidden app-section-pad p-5 sm:p-6 space-y-5 page-enter">
+            <!-- Header Halaman -->
+            <div class="card-pad bg-white rounded-2xl p-4 border border-hairline flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-3 min-w-0">
+                <button type="button" onclick="navigateCustomer('home')"
+                  class="w-9 h-9 rounded-xl bg-canvas hover:bg-[#ECEAE2] border border-hairline flex items-center justify-center text-ink shrink-0 transition">
+                  <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                </button>
+                <div class="min-w-0">
+                  <h1 class="t-h1 font-extrabold text-ink">Form Pemesanan & Estimasi Biaya</h1>
+                  <p class="t-sm text-muted">Pastikan data kendaraan, titik lokasi, dan rincian biaya sudah sesuai</p>
+                </div>
+              </div>
+              <span class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 t-xs font-bold border border-emerald-200 shrink-0">
+                Garansi Servis 7 Hari
+              </span>
+            </div>
+
+            <div class="responsive-grid-split grid grid-cols-1 lg:grid-cols-12 gap-5">
+              <!-- Kolom Kiri -->
+              <div class="lg:col-span-7 space-y-4">
+                <!-- 1. Data Kendaraan -->
+                <div class="card-pad bg-white rounded-2xl p-4 border border-hairline space-y-2.5">
+                  <div class="flex items-center justify-between">
+                    <h3 class="t-xs font-extrabold uppercase tracking-wider text-muted">1. Data Kendaraan</h3>
+                    <span class="t-xs font-bold text-ink cursor-pointer hover:underline">Ubah</span>
+                  </div>
+                  <div class="flex items-center justify-between bg-canvas p-3.5 rounded-xl border border-hairline gap-2">
+                    <div class="flex items-center gap-3 min-w-0">
+                      <div class="w-10 h-10 rounded-xl bg-white border border-hairline text-ink flex items-center justify-center shrink-0">
+                        <i data-lucide="bike" class="w-5 h-5"></i>
+                      </div>
+                      <div class="min-w-0">
+                        <p class="t-h3 font-bold text-ink truncate">Honda Vario 150 (<span class="font-mono tabular-nums">BE 1234 XX</span>)</p>
+                        <p class="t-xs text-muted">Matic • 2021 • 150cc</p>
+                      </div>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 t-xs font-bold shrink-0">Terpilih</span>
+                  </div>
+                </div>
+
+                <!-- 2. Titik Lokasi Servis -->
+                <div class="card-pad bg-white rounded-2xl p-4 border border-hairline space-y-3">
+                  <div class="flex items-center justify-between">
+                    <h3 class="t-xs font-extrabold uppercase tracking-wider text-muted">2. Titik Lokasi Servis</h3>
+                    <span class="t-xs font-bold text-ink cursor-pointer hover:underline">Sesuaikan Pin</span>
+                  </div>
+
+                  <div class="h-32 rounded-xl vector-map-bg border border-hairline relative overflow-hidden flex items-center justify-center">
+                    <div class="absolute inset-x-0 top-1/2 h-3 bg-white border-y border-[#DCD9CE] -translate-y-1/2"></div>
+                    <div class="absolute inset-y-0 left-1/3 w-3 bg-white border-x border-[#DCD9CE]"></div>
+                    <div class="relative z-10 flex flex-col items-center">
+                      <span class="bg-[#141518] text-white t-xs font-bold px-3 py-1 rounded-lg shadow-xs">Lokasi Anda (Rajabasa)</span>
+                      <div class="w-3.5 h-3.5 rounded-full bg-emerald-600 border-2 border-white mt-1 shadow-xs"></div>
+                    </div>
+                  </div>
+
+                  <div class="bg-canvas p-3.5 rounded-xl border border-hairline t-sm space-y-1">
+                    <p class="font-bold text-ink">Jl. ZA Pagar Alam No. 45, Rajabasa, Bandar Lampung</p>
+                    <p class="text-muted">Patokan: <strong class="text-ink">Depan Kosan Biru (Pagar Hitam)</strong></p>
+                  </div>
+                </div>
+
+                <!-- 3. Paket Layanan & Jadwal -->
+                <div class="card-pad bg-white rounded-2xl p-4 border border-hairline space-y-3">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <h3 class="t-xs font-extrabold uppercase tracking-wider text-muted">3. Paket Layanan & Jadwal</h3>
+                    <span id="pkg-duration" class="t-xs font-bold bg-canvas text-ink border border-hairline px-2.5 py-0.5 rounded-lg">Estimasi ~45 Menit</span>
+                  </div>
+
+                  <div class="bg-canvas border border-hairline rounded-xl p-3.5">
+                    <h4 id="pkg-name" class="t-h3 font-extrabold text-ink">Ganti Oli Mesin + Servis Ringan Transmisi</h4>
+                    <p id="pkg-desc" class="t-sm text-muted mt-1">Pembersihan CVT, cek oli gardan, kalibrasi injeksi & ganti oli MPX2.</p>
+                  </div>
+
+                  <div class="responsive-grid-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="bg-canvas p-3 rounded-xl border border-hairline">
+                      <span class="t-xs font-semibold text-muted block">Jadwal Kedatangan</span>
+                      <span class="t-sm font-bold text-ink mt-0.5 block">Minggu, 16 Nov 2026 • 09:30 WIB</span>
+                    </div>
+                    <div class="bg-canvas p-3 rounded-xl border border-hairline">
+                      <span class="t-xs font-semibold text-muted block">Catatan Tambahan</span>
+                      <span class="t-sm font-medium text-ink mt-0.5 block">Motor tarikan berat & rem belakang agak dalam.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Kolom Kanan: Rincian Transparansi Biaya -->
+              <div class="lg:col-span-5">
+                <div class="card-pad bg-white rounded-2xl p-5 border border-hairline space-y-4">
+                  <h3 class="t-h2 font-extrabold text-ink border-b border-hairline pb-3">Transparansi Biaya</h3>
+
+                  <div class="space-y-2.5 t-sm">
+                    <div class="flex justify-between gap-2 text-muted">
+                      <span>Jasa Servis Ringan</span>
+                      <span id="cost-service" class="font-mono font-bold text-ink tabular-nums shrink-0">Rp 50.000</span>
+                    </div>
+                    <div class="flex justify-between gap-2 text-muted">
+                      <span>Sparepart & Oli (MPX2 0.8L)</span>
+                      <span id="cost-part" class="font-mono font-bold text-ink tabular-nums shrink-0">Rp 65.000</span>
+                    </div>
+                    <div class="flex justify-between gap-2 text-muted">
+                      <span>Transport Mekanik</span>
+                      <span class="font-mono font-bold text-emerald-700 tabular-nums shrink-0">Rp 0</span>
+                    </div>
+
+                    <div class="pt-3 border-t border-dashed border-[#D8D5CC] flex items-center justify-between gap-2">
+                      <div>
+                        <span class="t-sm font-extrabold text-ink block">Total Estimasi</span>
+                        <span class="t-xs text-emerald-700 font-semibold">Garansi servis 7 hari</span>
+                      </div>
+                      <span id="cost-total" class="t-price-lg font-extrabold text-ink font-mono shrink-0">Rp 115.000</span>
+                    </div>
+                  </div>
+
+                  <div class="p-3 rounded-xl bg-canvas border border-hairline t-xs text-muted">
+                    Harga final hanya berubah jika ada penggantian suku cadang baru berdasarkan temuan fisik dan persetujuan Anda di tempat.
+                  </div>
+
+                  <label class="flex items-start gap-2.5 t-xs text-ink cursor-pointer">
+                    <input type="checkbox" checked class="mt-0.5 w-4 h-4 rounded accent-[#141518] shrink-0" />
+                    <span>Saya menyetujui rincian estimasi biaya, alur pemeriksaan fisik motor, dan ketentuan servis di atas.</span>
+                  </label>
+
+                  <button type="button" onclick="navigateCustomer('tracking')"
+                    class="w-full py-3.5 rounded-xl bg-[#141518] hover:bg-neutral-800 text-white font-bold t-sm transition flex items-center justify-center gap-2">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                    <span>Konfirmasi & Cari Teknisi</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- --------------------------------------------------------------- -->
+          <!-- HALAMAN C: PELACAKAN TEKNISI & INSPEKSI LAPANGAN                -->
+          <!-- --------------------------------------------------------------- -->
+          <div id="cview-tracking" class="cview hidden app-section-pad p-5 sm:p-6 space-y-5 page-enter">
+            <!-- Status Kedatangan Teknisi -->
+            <div class="card-pad bg-[#141518] text-white rounded-2xl p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <span class="t-xs text-neutral-400 font-medium">Status Progres</span>
+                <h1 id="track-status-title" class="t-h1 font-extrabold mt-0.5">Teknisi Menuju Lokasi</h1>
+              </div>
+              <div class="bg-white/10 border border-white/15 px-4 py-2 rounded-xl text-right">
+                <span class="t-xs uppercase font-bold text-neutral-300 block">Estimasi Tiba</span>
+                <span id="track-eta-text" class="t-price-md font-extrabold font-mono text-emerald-400">8 Menit</span>
+              </div>
+            </div>
+
+            <!-- Segmented Control Alur Penanganan -->
+            <div class="card-pad bg-white rounded-2xl p-3 border border-hairline">
+              <div class="responsive-grid-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <button type="button" onclick="setProgressStage(1)" id="stage-btn-1"
+                  class="stage-pill p-3 rounded-xl bg-[#141518] text-white text-left transition">
+                  <span class="t-sm font-extrabold block">1. Menuju Lokasi</span>
+                  <span class="t-xs text-neutral-300 font-mono tabular-nums">1.8 KM</span>
+                </button>
+                <button type="button" onclick="setProgressStage(2)" id="stage-btn-2"
+                  class="stage-pill p-3 rounded-xl bg-canvas hover:bg-[#ECEAE2] text-ink text-left transition">
+                  <span class="t-sm font-extrabold block">2. Inspeksi</span>
+                  <span class="t-xs text-muted">Cek Awal</span>
+                </button>
+                <button type="button" onclick="setProgressStage(3)" id="stage-btn-3"
+                  class="stage-pill p-3 rounded-xl bg-canvas hover:bg-[#ECEAE2] text-ink text-left transition">
+                  <span class="t-sm font-extrabold block">3. Servis</span>
+                  <span class="t-xs text-muted">Pengerjaan</span>
+                </button>
+                <button type="button" onclick="setProgressStage(4)" id="stage-btn-4"
+                  class="stage-pill p-3 rounded-xl bg-canvas hover:bg-[#ECEAE2] text-ink text-left transition">
+                  <span class="t-sm font-extrabold block">4. Selesai</span>
+                  <span class="t-xs text-muted">Invoice</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="responsive-grid-split grid grid-cols-1 lg:grid-cols-12 gap-5">
+              <!-- Kiri: Peta Live Tracking & Profil Teknisi Budi Santoso -->
+              <div class="lg:col-span-6 space-y-4">
+                <div class="bg-white rounded-2xl p-3 border border-hairline">
+                  <div class="h-52 rounded-xl vector-map-bg border border-hairline relative overflow-hidden">
+                    <span class="absolute top-3 left-3 bg-white px-2.5 py-1 rounded-lg border border-hairline t-xs font-bold text-emerald-800 shadow-2xs flex items-center gap-1.5">
+                      <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse shrink-0"></span>
+                      <span>GPS Aktif • Akurasi 3m</span>
+                    </span>
+                    <svg class="absolute inset-0 w-full h-full" viewBox="0 0 360 200">
+                      <path d="M 70 145 Q 160 140, 195 95 T 290 55" fill="none" stroke="#141518" stroke-width="4" stroke-dasharray="7 5" stroke-linecap="round" />
+                    </svg>
+                    <!-- Posisi Teknisi -->
+                    <div class="absolute left-[19%] top-[68%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                      <div class="w-8 h-8 rounded-full bg-[#141518] text-white border-2 border-white shadow-md flex items-center justify-center">
+                        <i data-lucide="bike" class="w-4 h-4"></i>
+                      </div>
+                      <span class="mt-1 bg-[#141518] text-white t-xs font-bold px-2 py-0.5 rounded whitespace-nowrap">Budi Santoso</span>
+                    </div>
+                    <!-- Tujuan Pelanggan -->
+                    <div class="absolute left-[80%] top-[28%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                      <div class="w-8 h-8 rounded-full bg-emerald-700 text-white border-2 border-white shadow-md flex items-center justify-center">
+                        <i data-lucide="home" class="w-4 h-4"></i>
+                      </div>
+                      <span class="mt-1 bg-white text-ink border border-hairline t-xs font-bold px-2 py-0.5 rounded whitespace-nowrap">Kosan Rian</span>
+                    </div>
+                    <!-- Info Telemetri -->
+                    <div class="absolute bottom-2.5 inset-x-2.5 bg-white/95 border border-hairline text-ink px-3 py-1.5 rounded-lg flex justify-between t-xs font-mono tabular-nums">
+                      <span>32 KM/H</span>
+                      <span class="text-emerald-800 font-bold">DIST: 1.8 KM</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Kartu Teknisi -->
+                <div class="card-pad bg-white rounded-2xl p-4 border border-hairline flex flex-wrap items-center justify-between gap-3">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-12 h-12 rounded-2xl bg-[#141518] text-white font-extrabold t-sm flex items-center justify-center shrink-0">BS</div>
+                    <div class="min-w-0">
+                      <div class="flex items-center gap-2">
+                        <h3 class="t-h3 font-extrabold text-ink truncate">Budi Santoso</h3>
+                        <span class="t-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 px-1.5 py-0.5 rounded shrink-0">★ 4.8</span>
+                      </div>
+                      <p class="t-sm text-muted truncate">Honda Beat FI (Hitam - Boks Tool)</p>
+                      <p class="t-xs text-emerald-800 font-semibold">142 Servis Terselesaikan • Terverifikasi</p>
+                    </div>
+                  </div>
+                  <div class="flex gap-2 shrink-0">
+                    <span class="px-3 py-2 rounded-xl bg-canvas text-ink t-xs font-bold border border-hairline flex items-center gap-1.5">
+                      <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+                      <span>Chat</span>
+                    </span>
+                    <span class="px-3 py-2 rounded-xl bg-canvas text-ink t-xs font-bold border border-hairline flex items-center gap-1.5">
+                      <i data-lucide="phone" class="w-3.5 h-3.5"></i>
+                      <span>Telepon</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Kanan: Checklist Inspeksi Awal & Konfirmasi Temuan -->
+              <div class="lg:col-span-6 space-y-4">
+                <div class="card-pad bg-white rounded-2xl p-4 border border-hairline space-y-2.5">
+                  <h3 class="t-xs font-extrabold uppercase tracking-wider text-muted">Checklist Inspeksi Awal</h3>
+                  <div class="p-3 rounded-xl bg-canvas border border-hairline flex items-center justify-between gap-2">
+                    <div class="min-w-0">
+                      <p class="t-sm font-bold text-ink">Oli Mesin</p>
+                      <p class="t-xs text-muted">Vol: 0.8L • Shell Advance / MPX2</p>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 t-xs font-bold shrink-0">Hitam / Perlu Ganti</span>
+                  </div>
+                  <div class="p-3 rounded-xl bg-amber-50/60 border border-amber-300 flex items-center justify-between gap-2">
+                    <div class="min-w-0">
+                      <p class="t-sm font-bold text-ink">Rem Depan & Belakang</p>
+                      <p class="t-xs text-muted">Tebal: &lt; 1.5mm (Aus)</p>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-lg bg-amber-700 text-white t-xs font-bold shrink-0">Kampas Tipis</span>
+                  </div>
+                  <div class="p-3 rounded-xl bg-canvas border border-hairline flex items-center justify-between gap-2">
+                    <div class="min-w-0">
+                      <p class="t-sm font-bold text-ink">Busi & Filter Udara</p>
+                      <p class="t-xs text-muted">Elektroda bersih, celah normal</p>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-900 t-xs font-bold shrink-0">Masih Baik</span>
+                  </div>
+                </div>
+
+                <!-- Konfirmasi Temuan Lapangan -->
+                <div class="card-pad bg-white border-2 border-amber-600/70 rounded-2xl p-4 space-y-3">
+                  <div>
+                    <div class="flex items-center gap-1.5 text-amber-900 font-extrabold t-sm">
+                      <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-700 shrink-0"></i>
+                      <span>Pemberitahuan Temuan Lapangan</span>
+                    </div>
+                    <p class="t-sm text-muted mt-1">
+                      Teknisi menemukan kampas rem aus melewati batas aman. Disarankan penggantian langsung dengan estimasi tambahan:
+                    </p>
+                  </div>
+                  <div class="bg-canvas p-3 rounded-xl border border-hairline flex items-center justify-between gap-2">
+                    <span class="t-sm font-bold text-ink">Kampas Rem + Jasa Pasang Baru</span>
+                    <span class="t-price-md font-extrabold font-mono text-amber-800 shrink-0">+Rp 35.000</span>
+                  </div>
+                  <div class="responsive-grid-2 grid grid-cols-2 gap-2.5">
+                    <button type="button" onclick="proceedToInvoice(false)"
+                      class="py-2.5 px-3 rounded-xl bg-canvas hover:bg-[#ECEAE2] text-ink border border-hairline font-bold t-xs transition">
+                      Tolak
+                    </button>
+                    <button type="button" onclick="proceedToInvoice(true)"
+                      class="py-2.5 px-3 rounded-xl bg-[#141518] hover:bg-neutral-800 text-white font-bold t-xs transition">
+                      Setujui (+Rp 35.000)
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- --------------------------------------------------------------- -->
+          <!-- HALAMAN D: INVOICE DIGITAL & ULASAN LAYANAN                     -->
+          <!-- --------------------------------------------------------------- -->
+          <div id="cview-invoice" class="cview hidden app-section-pad p-5 sm:p-6 space-y-5 page-enter">
+            <!-- Header Invoice Tervalidasi -->
+            <div class="card-pad bg-white rounded-2xl p-5 border border-hairline flex flex-wrap items-center justify-between gap-4">
+              <div class="flex items-center gap-3.5 min-w-0">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center shrink-0">
+                  <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                </div>
+                <div class="min-w-0">
+                  <span class="t-xs font-bold bg-emerald-700 text-white px-2.5 py-0.5 rounded-full inline-block">Servis Selesai & Tervalidasi</span>
+                  <h1 class="t-h1 font-extrabold text-ink mt-1">Invoice & Penilaian Layanan</h1>
+                  <p class="t-sm text-muted">Pengerjaan: Minggu, 16 Nov 2026 • 10:45 WIB</p>
+                </div>
+              </div>
+              <div class="flex flex-wrap gap-2.5">
+                <div class="bg-canvas px-3.5 py-2 rounded-xl border border-hairline">
+                  <span class="t-xs text-muted block">No. Invoice</span>
+                  <span class="t-sm font-mono font-bold text-ink tabular-nums">INV-2026-0012</span>
+                </div>
+                <div class="bg-emerald-50 px-3.5 py-2 rounded-xl border border-emerald-200">
+                  <span class="t-xs text-emerald-800 block">Status Bayar</span>
+                  <span class="t-sm font-bold text-emerald-900">Lunas • QRIS</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="responsive-grid-split grid grid-cols-1 lg:grid-cols-12 gap-5">
+              <!-- Kiri: Rincian Pembayaran & Bukti Foto Sebelum/Sesudah -->
+              <div class="lg:col-span-6 space-y-4">
+                <div class="card-pad bg-white rounded-2xl p-5 border border-hairline space-y-3">
+                  <h3 class="t-xs font-extrabold uppercase tracking-wider text-muted">Rincian Pembayaran Akhir</h3>
+                  <div class="space-y-2 t-sm">
+                    <div class="flex justify-between gap-2">
+                      <span class="text-ink font-semibold">Jasa Servis + Oli Mesin (MPX2 0.8L)</span>
+                      <span id="final-base-cost" class="font-mono font-bold text-ink tabular-nums shrink-0">Rp 115.000</span>
+                    </div>
+                    <div class="flex justify-between gap-2">
+                      <span id="final-extra-label" class="text-muted">Biaya Tambahan (Kampas Rem)</span>
+                      <span id="final-extra-cost" class="font-mono font-bold text-ink tabular-nums shrink-0">Rp 0</span>
+                    </div>
+                    <div class="flex justify-between gap-2">
+                      <span class="text-muted">Biaya Layanan</span>
+                      <span class="font-mono font-bold text-emerald-700 tabular-nums shrink-0">Rp 0 (Diskon)</span>
+                    </div>
+                    <div class="pt-3 border-t border-dashed border-[#D8D5CC] flex items-center justify-between gap-2">
+                      <div>
+                        <span class="t-sm font-extrabold text-ink block">Total Bayar</span>
+                        <span class="t-xs text-muted">Metode: QRIS / E-Wallet</span>
+                      </div>
+                      <span id="final-grand-total" class="t-price-lg font-extrabold font-mono text-ink shrink-0">Rp 115.000</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Arsip Bukti Foto Sebelum & Sesudah -->
+                <div class="card-pad bg-white rounded-2xl p-5 border border-hairline space-y-3">
+                  <h3 class="t-xs font-extrabold uppercase tracking-wider text-muted">Arsip Bukti Servis Lapangan</h3>
+                  <div class="responsive-grid-2 grid grid-cols-2 gap-3">
+                    <div class="rounded-xl border border-hairline overflow-hidden">
+                      <div class="h-24 bg-gradient-to-br from-neutral-800 to-neutral-950 p-3 flex flex-col justify-between text-white">
+                        <span class="self-start t-xs font-bold bg-amber-700 px-2 py-0.5 rounded">Sebelum</span>
+                        <span class="t-xs text-neutral-300">Kondisi Oli Lama</span>
+                      </div>
+                      <div class="p-2.5 bg-canvas t-xs">
+                        <p class="font-bold text-ink">Oli keruh / hitam pekat</p>
+                      </div>
+                    </div>
+                    <div class="rounded-xl border border-emerald-200 overflow-hidden">
+                      <div class="h-24 bg-gradient-to-br from-emerald-700 to-teal-900 p-3 flex flex-col justify-between text-white">
+                        <span class="self-start t-xs font-bold bg-[#141518] text-white px-2 py-0.5 rounded">Sesudah</span>
+                        <span class="t-xs text-emerald-100">Oli Baru & Rantai</span>
+                      </div>
+                      <div class="p-2.5 bg-emerald-50/60 t-xs">
+                        <p class="font-bold text-emerald-950">Pelumasan optimal 100%</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Kanan: Penilaian Teknisi & Pengingat Servis Rutin -->
+              <div class="lg:col-span-6 space-y-4">
+                <div class="card-pad bg-white rounded-2xl p-5 border border-hairline space-y-4">
+                  <div class="flex items-center justify-between gap-2">
+                    <div class="min-w-0">
+                      <h3 class="t-xs font-extrabold uppercase tracking-wider text-muted">Penilaian Teknisi Lapangan</h3>
+                      <p class="t-h3 font-bold text-ink mt-0.5 truncate">Budi Santoso • Mekanik Ahli</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-[#141518] text-white font-bold t-xs flex items-center justify-center shrink-0">BS</div>
+                  </div>
+
+                  <!-- Bintang Rating -->
+                  <div class="bg-canvas p-3.5 rounded-xl border border-hairline text-center">
+                    <div class="flex flex-wrap justify-center gap-1.5">
+                      <button type="button" onclick="rateMechanic(1)" class="star-btn px-3 py-1.5 rounded-lg bg-[#141518] text-amber-400 font-bold t-xs">★ 1</button>
+                      <button type="button" onclick="rateMechanic(2)" class="star-btn px-3 py-1.5 rounded-lg bg-[#141518] text-amber-400 font-bold t-xs">★ 2</button>
+                      <button type="button" onclick="rateMechanic(3)" class="star-btn px-3 py-1.5 rounded-lg bg-[#141518] text-amber-400 font-bold t-xs">★ 3</button>
+                      <button type="button" onclick="rateMechanic(4)" class="star-btn px-3 py-1.5 rounded-lg bg-[#141518] text-amber-400 font-bold t-xs">★ 4</button>
+                      <button type="button" onclick="rateMechanic(5)" class="star-btn px-3 py-1.5 rounded-lg bg-[#141518] text-amber-400 font-bold t-xs">★ 5</button>
+                    </div>
+                    <p id="rating-caption" class="t-xs font-bold text-ink mt-2">Skor: 5 / 5 — Sangat Puas</p>
+                  </div>
+
+                  <!-- Tag Keunggulan -->
+                  <div class="flex flex-wrap gap-2">
+                    <button type="button" onclick="toggleChip(this)" class="px-3 py-1.5 rounded-xl t-xs font-bold bg-[#141518] text-white border border-[#141518] transition">Pekerjaan Rapi</button>
+                    <button type="button" onclick="toggleChip(this)" class="px-3 py-1.5 rounded-xl t-xs font-bold bg-[#141518] text-white border border-[#141518] transition">Tepat Waktu</button>
+                    <button type="button" onclick="toggleChip(this)" class="px-3 py-1.5 rounded-xl t-xs font-semibold bg-white text-ink border border-hairline transition">Ramah & Sopan</button>
+                    <button type="button" onclick="toggleChip(this)" class="px-3 py-1.5 rounded-xl t-xs font-semibold bg-white text-ink border border-hairline transition">Mesin Halus</button>
+                  </div>
+
+                  <textarea rows="2" class="w-full p-3 t-sm bg-canvas border border-hairline rounded-xl text-ink focus:outline-none focus:border-ink">Pengerjaan rapi dan tepat waktu. Mekaniknya jujur jelasin kondisi motor.</textarea>
+
+                  <!-- Pengingat Servis Rutin -->
+                  <div class="flex items-center justify-between gap-2 bg-canvas p-3 rounded-xl border border-hairline">
+                    <div>
+                      <p class="t-sm font-bold text-ink">Pengingat Servis Rutin</p>
+                      <p class="t-xs text-muted">Jadwal otomatis: 16 Feb 2027</p>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-lg bg-emerald-700 text-white font-bold t-xs shrink-0">Aktif ✓</span>
+                  </div>
+
+                  <button type="button" onclick="navigateCustomer('home')"
+                    class="w-full py-3 rounded-xl bg-[#141518] hover:bg-neutral-800 text-white font-bold t-sm transition">
+                    Kirim Ulasan & Selesai
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Navigation Bar untuk Tablet & HP -->
+          <nav class="mobile-tablet-bottom-nav hidden lg:hidden w-full bg-white border-t border-hairline px-2 py-2.5 grid-cols-4 items-center sticky bottom-0 z-30 mt-auto">
+            <button type="button" onclick="navigateCustomer('home')" data-bnav="home" class="bottom-nav-btn w-full py-1 flex flex-col items-center justify-center text-ink">
+              <i data-lucide="home" class="w-4 h-4"></i>
+              <span class="t-nav font-bold mt-1">Beranda</span>
+            </button>
+            <button type="button" onclick="navigateCustomer('order')" data-bnav="order" class="bottom-nav-btn w-full py-1 flex flex-col items-center justify-center text-muted">
+              <i data-lucide="calendar-plus" class="w-4 h-4"></i>
+              <span class="t-nav font-semibold mt-1">Pesan</span>
+            </button>
+            <button type="button" onclick="navigateCustomer('tracking')" data-bnav="tracking" class="bottom-nav-btn w-full py-1 flex flex-col items-center justify-center text-muted">
+              <i data-lucide="navigation" class="w-4 h-4"></i>
+              <span class="t-nav font-semibold mt-1">Lacak</span>
+            </button>
+            <button type="button" onclick="navigateCustomer('invoice')" data-bnav="invoice" class="bottom-nav-btn w-full py-1 flex flex-col items-center justify-center text-muted">
+              <i data-lucide="receipt" class="w-4 h-4"></i>
+              <span class="t-nav font-semibold mt-1">Invoice</span>
+            </button>
+          </nav>
+
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- SCREEN 3: DASHBOARD MITRA MEKANIK (Budi Santoso - admin)          -->
+      <!-- ================================================================= -->
+      <div id="screen-admin" class="hidden flex-1 flex flex-col bg-canvas page-enter">
+        <div class="bg-[#141518] text-white px-5 py-4 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-xl bg-emerald-700 flex items-center justify-center font-extrabold t-sm shrink-0">BS</div>
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <h1 class="t-h2 font-extrabold truncate">Dashboard Mitra Mekanik</h1>
+                <span class="t-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full shrink-0">Online</span>
+              </div>
+              <p class="t-xs text-neutral-400 truncate">Budi Santoso • Area Rajabasa, Bandar Lampung</p>
+            </div>
+          </div>
+          <button type="button" onclick="logoutApp()"
+            class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 t-xs font-bold text-white transition flex items-center gap-1.5 shrink-0">
+            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+            <span>Keluar</span>
+          </button>
+        </div>
+
+        <div class="app-section-pad p-5 sm:p-6 space-y-5 max-w-5xl w-full mx-auto">
+          <div class="responsive-grid-3 grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+            <div class="card-pad bg-white rounded-2xl p-4 border border-hairline">
+              <span class="t-xs text-muted">Order Aktif Saat Ini</span>
+              <p class="t-price-lg font-extrabold text-ink mt-1">1 Pesanan</p>
+              <span class="t-xs text-emerald-800 font-semibold block mt-0.5">Rian Saputra • Honda Vario 150</span>
+            </div>
+            <div class="card-pad bg-white rounded-2xl p-4 border border-hairline">
+              <span class="t-xs text-muted">Rating Kepuasan</span>
+              <p class="t-price-lg font-extrabold text-ink mt-1">★ 4.8 / 5.0</p>
+              <span class="t-xs text-muted block mt-0.5">142 Servis Terselesaikan</span>
+            </div>
+            <div class="card-pad bg-white rounded-2xl p-4 border border-hairline">
+              <span class="t-xs text-muted">Estimasi Pendapatan</span>
+              <p class="t-price-lg font-extrabold font-mono text-ink mt-1">Rp 115.000</p>
+              <span class="t-xs text-muted block mt-0.5">Metode QRIS / E-Wallet</span>
+            </div>
+          </div>
+
+          <div class="card-pad bg-white rounded-2xl p-5 border border-hairline space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-hairline pb-3">
+              <div class="min-w-0">
+                <span class="t-xs font-mono font-bold bg-canvas border border-hairline text-ink px-2.5 py-0.5 rounded tabular-nums">INV-2026-0012</span>
+                <h2 class="t-h2 font-extrabold text-ink mt-1">Rian Saputra — Honda Vario 150 (<span class="font-mono tabular-nums">BE 1234 XX</span>)</h2>
+                <p class="t-sm text-muted">Jl. ZA Pagar Alam No. 45, Rajabasa (Depan Kosan Biru, Pagar Hitam)</p>
+              </div>
+              <span id="mechanic-status-badge" class="px-3 py-1 rounded-full bg-amber-100 text-amber-900 t-xs font-bold shrink-0">
+                Menuju Lokasi Pelanggan
+              </span>
+            </div>
+
+            <div>
+              <span class="t-sm font-bold text-ink block mb-2">Perbarui Status Pengerjaan:</span>
+              <div class="responsive-grid-4 grid grid-cols-1 sm:grid-cols-4 gap-2">
+                <button type="button" onclick="updateMechanicStatus('Menuju Lokasi Pelanggan', this)"
+                  class="mech-status-btn py-2.5 px-3 rounded-xl bg-[#141518] text-white font-bold t-xs text-left">
+                  1. Menuju Lokasi
+                </button>
+                <button type="button" onclick="updateMechanicStatus('Inspeksi Awal Kendaraan', this)"
+                  class="mech-status-btn py-2.5 px-3 rounded-xl bg-canvas hover:bg-[#ECEAE2] text-ink font-semibold t-xs text-left">
+                  2. Inspeksi Awal
+                </button>
+                <button type="button" onclick="updateMechanicStatus('Pengerjaan Servis & Ganti Oli', this)"
+                  class="mech-status-btn py-2.5 px-3 rounded-xl bg-canvas hover:bg-[#ECEAE2] text-ink font-semibold t-xs text-left">
+                  3. Pengerjaan Servis
+                </button>
+                <button type="button" onclick="updateMechanicStatus('Servis Selesai & Tervalidasi', this)"
+                  class="mech-status-btn py-2.5 px-3 rounded-xl bg-canvas hover:bg-[#ECEAE2] text-ink font-semibold t-xs text-left">
+                  4. Selesai & Invoice
+                </button>
+              </div>
+            </div>
+
+            <div class="responsive-grid-2 grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              <div class="bg-canvas rounded-xl p-4 border border-hairline space-y-2 t-sm">
+                <h3 class="t-xs font-extrabold text-ink uppercase">Hasil Inspeksi Lapangan</h3>
+                <div class="flex justify-between gap-2 py-1 border-b border-hairline">
+                  <span>Oli Mesin (0.8L MPX2)</span>
+                  <span class="font-bold text-amber-800 shrink-0">Hitam / Perlu Ganti</span>
+                </div>
+                <div class="flex justify-between gap-2 py-1 border-b border-hairline">
+                  <span>Kampas Rem (&lt; 1.5mm)</span>
+                  <span class="font-bold text-amber-800 tabular-nums shrink-0">Aus (+Rp 35.000)</span>
+                </div>
+                <div class="flex justify-between gap-2 py-1">
+                  <span>Busi & Filter Udara</span>
+                  <span class="font-bold text-emerald-800 shrink-0">Masih Baik</span>
+                </div>
+              </div>
+
+              <div class="bg-canvas rounded-xl p-4 border border-hairline space-y-2">
+                <h3 class="t-xs font-extrabold text-ink uppercase">Dokumentasi Pengerjaan</h3>
+                <div class="grid grid-cols-2 gap-2.5">
+                  <div class="h-20 rounded-lg bg-neutral-900 text-white p-2.5 flex flex-col justify-between">
+                    <span class="t-xs font-bold bg-amber-700 self-start px-1.5 py-0.5 rounded">Sebelum</span>
+                    <span class="t-xs">Oli Lama Pekat</span>
+                  </div>
+                  <div class="h-20 rounded-lg bg-emerald-800 text-white p-2.5 flex flex-col justify-between">
+                    <span class="t-xs font-bold bg-[#141518] self-start px-1.5 py-0.5 rounded">Sesudah</span>
+                    <span class="t-xs">Oli Baru & Rantai</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- VIEW 2: DESIGN SYSTEM DOCUMENTATION                                   -->
+  <!-- ===================================================================== -->
+  <section id="view-ds" class="hidden flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6 page-enter">
+    <div class="bg-[#141518] text-white rounded-3xl p-6 sm:p-8 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <span class="t-xs font-semibold text-emerald-400">Standar Antarmuka & Aksesibilitas</span>
+        <h1 class="t-display font-extrabold mt-1">AutoCare Design System</h1>
+        <p class="t-body text-neutral-300 mt-1.5 max-w-2xl">
+          Sistem desain editorial otomotif dengan latar belakang Warm Off-White (#F7F6F2), aksen Charcoal Ink (#141518) berdaya kontras tinggi, serta tipografi fluid responsif (Plus Jakarta Sans & JetBrains Mono).
+        </p>
+      </div>
+      <button type="button" onclick="setStudioTab('prototype')"
+        class="px-4 py-2.5 rounded-xl bg-white hover:bg-neutral-200 text-ink t-xs font-bold shrink-0">
+        ← Kembali ke Prototype
+      </button>
+    </div>
+
+    <!-- 1. Palet Warna -->
+    <div class="bg-white rounded-3xl p-6 border border-hairline space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-hairline pb-3">
+        <h2 class="t-h2 font-extrabold text-ink">1. Palet Warna & Rasio Kontras (WCAG AA/AAA)</h2>
+        <span class="t-xs bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-full font-bold">Kontras Teks ≥ 4.5:1</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 t-xs">
+        <div class="rounded-2xl border border-hairline overflow-hidden">
+          <div class="h-20 bg-[#141518] p-3 text-white flex items-end font-mono font-bold">#141518</div>
+          <div class="p-3"><p class="font-bold text-ink">Charcoal Ink</p><p class="text-muted">Kontras 18.2:1 (AAA) • Aksi Utama</p></div>
+        </div>
+        <div class="rounded-2xl border border-hairline overflow-hidden">
+          <div class="h-20 bg-[#F7F6F2] p-3 text-ink border-b border-hairline flex items-end font-mono font-bold">#F7F6F2</div>
+          <div class="p-3"><p class="font-bold text-ink">Warm Off-White</p><p class="text-muted">Latar Kanvas Nyaman di Mata</p></div>
+        </div>
+        <div class="rounded-2xl border border-hairline overflow-hidden">
+          <div class="h-20 bg-[#0F766E] p-3 text-white flex items-end font-mono font-bold">#0F766E</div>
+          <div class="p-3"><p class="font-bold text-ink">Forest Emerald</p><p class="text-muted">Kontras 5.4:1 (AA) • Terverifikasi</p></div>
+        </div>
+        <div class="rounded-2xl border border-hairline overflow-hidden">
+          <div class="h-20 bg-[#B45309] p-3 text-white flex items-end font-mono font-bold">#B45309</div>
+          <div class="p-3"><p class="font-bold text-ink">Warm Amber</p><p class="text-muted">Kontras 5.0:1 (AA) • Temuan Servis</p></div>
+        </div>
+        <div class="rounded-2xl border border-hairline overflow-hidden">
+          <div class="h-20 bg-[#FFFFFF] p-3 text-ink border-b border-hairline flex items-end font-mono font-bold">#FFFFFF</div>
+          <div class="p-3"><p class="font-bold text-ink">Crisp Surface</p><p class="text-muted">Kartu dengan Hairline #E6E4DD</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Skala Tipografi Responsif -->
+    <div class="bg-white rounded-3xl p-6 border border-hairline space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-hairline pb-3">
+        <h2 class="t-h2 font-extrabold text-ink">2. Skala Tipografi Fluid & Breakpoint (Desktop • Tablet • HP)</h2>
+        <span class="t-xs bg-canvas text-ink border border-hairline px-3 py-1 rounded-full font-mono font-bold">CSS clamp() + Mode Tokens</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-hairline t-xs font-extrabold uppercase text-muted">
+              <th class="py-2.5 pr-4">Token</th>
+              <th class="py-2.5 px-3">Contoh Visual</th>
+              <th class="py-2.5 px-3 font-mono">HP (390px)</th>
+              <th class="py-2.5 px-3 font-mono">Tablet (768px)</th>
+              <th class="py-2.5 pl-3 font-mono">Desktop (1180px)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-hairline">
+            <tr>
+              <td class="py-3 pr-4 font-mono t-xs font-bold text-ink">--text-display</td>
+              <td class="py-3 px-3"><span class="t-display font-extrabold text-ink">Halo, Rian Saputra</span></td>
+              <td class="py-3 px-3 font-mono t-xs text-muted tabular-nums">22px / 1.375rem</td>
+              <td class="py-3 px-3 font-mono t-xs text-muted tabular-nums">27px / 1.6875rem</td>
+              <td class="py-3 pl-3 font-mono t-xs text-ink font-bold tabular-nums">32px / 2rem</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-4 font-mono t-xs font-bold text-ink">--text-h1</td>
+              <td class="py-3 px-3"><span class="t-h1 font-extrabold text-ink">Invoice & Penilaian Layanan</span></td>
+              <td class="py-3 px-3 font-mono t-xs text-muted tabular-nums">20px / 1.25rem</td>
+              <td class="py-3 px-3 font-mono t-xs text-muted tabular-nums">23px / 1.4375rem</td>
+              <td class="py-3 pl-3 font-mono t-xs text-ink font-bold tabular-nums">26px / 1.625rem</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-4 font-mono t-xs font-bold text-ink">--text-h2</td>
+              <td class="py-3 px-3"><span class="t-h2 font-extrabold text-ink">Pilih Paket Layanan Servis</span></td>
+              <td class="py-3 px-3 font-mono t-xs text-muted tabular-nums">16.5px / 1.03rem</td>
+              <td class="py-3 px-3 font-mono t-xs text-muted tabular-nums">18.5px / 1.15rem</td>
+              <td class="py-3 pl-3 font-mono t-xs text-ink font-bold tabular-nums">20px / 1.25rem</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-4 font-mono t-xs font-bold text-ink">--text-body</td>
+              <td class="py-3 px-3"><span class="t-body text-muted">Panggil mekanik langsung ke rumah atau kosan tanpa antre.</span></td>
+              <td class="py-3 px-3 font-mono t-xs text-muted tabular-nums">13px / 0.8125rem</td>
+              <td class="py-3 px-3 font-mono t-xs text-muted tabular-nums">14px / 0.875rem</td>
+              <td class="py-3 pl-3 font-mono t-xs text-ink font-bold tabular-nums">14.5px / 0.906rem</td>
+            </tr>
+            <tr>
+              <td class="py-3 pr-4 font-mono t-xs font-bold text-ink">--text-price-lg</td>
+              <td class="py-3 px-3"><span class="t-price-lg font-mono font-extrabold text-ink">Rp 115.000</span></td>
+              <td class="py-3 px-3 font-mono t-xs text-muted tabular-nums">20px / 1.25rem</td>
+              <td class="py-3 px-3 font-mono t-xs text-muted tabular-nums">23px / 1.4375rem</td>
+              <td class="py-3 pl-3 font-mono t-xs text-ink font-bold tabular-nums">26px / 1.625rem</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 3. Komponen UI -->
+    <div class="bg-white rounded-3xl p-6 border border-hairline space-y-4">
+      <h2 class="t-h2 font-extrabold text-ink border-b border-hairline pb-3">3. Komponen Tombol, Input & Badge</h2>
+      <div class="flex flex-wrap gap-2">
+        <span class="px-4 py-2 rounded-xl bg-[#141518] text-white t-xs font-bold">Tombol Utama</span>
+        <span class="px-4 py-2 rounded-xl bg-canvas border border-hairline text-ink t-xs font-bold">Tombol Sekunder</span>
+        <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 t-xs font-bold">Lunas • QRIS</span>
+        <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 t-xs font-bold">Hitam / Perlu Ganti</span>
+        <span class="px-2.5 py-1 rounded-lg bg-amber-700 text-white t-xs font-bold">Kampas Tipis</span>
+      </div>
+      <input type="text" readonly value="Contoh Input Field (Radius 12px • Border #E6E4DD • Skala Teks --text-body)"
+        class="w-full px-3.5 py-2.5 t-body bg-canvas border border-hairline rounded-xl text-ink" />
+    </div>
+  </section>
+
+  <script>
+    lucide.createIcons();
+
+    let currentPackage = {
+      name: 'Ganti Oli Mesin + Servis Ringan Transmisi',
+      desc: 'Pembersihan CVT, cek oli gardan, kalibrasi injeksi & ganti oli MPX2.',
+      duration: 'Estimasi ~45 Menit',
+      service: 50000,
+      part: 65000
+    };
+    let isBrakePadApproved = false;
+
+    function formatRupiah(amount) {
+      return 'Rp ' + amount.toLocaleString('id-ID');
+    }
+
+    function setStudioTab(tab) {
+      const protoCanvas = document.getElementById('canvas-wrapper');
+      const dsView = document.getElementById('view-ds');
+      const vpSwitcher = document.getElementById('viewport-switcher');
+      const btnProto = document.getElementById('tab-prototype');
+      const btnDs = document.getElementById('tab-ds');
+
+      if (tab === 'prototype') {
+        protoCanvas.classList.remove('hidden');
+        dsView.classList.add('hidden');
+        vpSwitcher.classList.remove('hidden');
+        btnProto.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white text-[#141518] shadow-xs transition';
+        btnDs.className = 'px-3.5 py-1.5 rounded-lg text-xs font-medium text-neutral-300 hover:text-white transition';
+      } else {
+        protoCanvas.classList.add('hidden');
+        dsView.classList.remove('hidden');
+        vpSwitcher.classList.add('hidden');
+        btnDs.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white text-[#141518] shadow-xs transition';
+        btnProto.className = 'px-3.5 py-1.5 rounded-lg text-xs font-medium text-neutral-300 hover:text-white transition';
+      }
+      lucide.createIcons();
+    }
+
+    function setDeviceMode(mode) {
+      const frame = document.getElementById('device-frame');
+      frame.classList.remove('mode-desktop', 'mode-tablet', 'mode-mobile');
+      frame.classList.add(`mode-${mode}`);
+
+      document.querySelectorAll('.vp-tab').forEach(btn => {
+        btn.className = 'vp-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-neutral-300 hover:text-white transition';
+      });
+      document.getElementById(`btn-vp-${mode}`).className =
+        'vp-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-[#141518] shadow-xs transition';
+    }
+
+    function quickFill(username, password) {
+      document.getElementById('login-user').value = username;
+      document.getElementById('login-pass').value = password;
+      document.getElementById('login-alert').classList.add('hidden');
+    }
+
+    function togglePasswordVisibility() {
+      const input = document.getElementById('login-pass');
+      const btn = document.getElementById('btn-show-pass');
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = 'Tutup';
+      } else {
+        input.type = 'password';
+        btn.textContent = 'Lihat';
+      }
+    }
+
+    function submitLogin(e) {
+      e.preventDefault();
+      const user = document.getElementById('login-user').value.trim().toLowerCase();
+      const pass = document.getElementById('login-pass').value.trim().toLowerCase();
+      const alertBox = document.getElementById('login-alert');
+
+      if (user === 'user1' && pass === 'user1') {
+        alertBox.classList.add('hidden');
+        document.getElementById('screen-login').classList.add('hidden');
+        document.getElementById('screen-admin').classList.add('hidden');
+        document.getElementById('screen-customer').classList.remove('hidden');
+        navigateCustomer('home');
+      } else if (user === 'admin' && pass === 'admin') {
+        alertBox.classList.add('hidden');
+        document.getElementById('screen-login').classList.add('hidden');
+        document.getElementById('screen-customer').classList.add('hidden');
+        document.getElementById('screen-admin').classList.remove('hidden');
+        lucide.createIcons();
+      } else {
+        alertBox.classList.remove('hidden');
+      }
+    }
+
+    function logoutApp() {
+      document.getElementById('screen-customer').classList.add('hidden');
+      document.getElementById('screen-admin').classList.add('hidden');
+      document.getElementById('screen-login').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function navigateCustomer(viewName) {
+      document.querySelectorAll('.cview').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`cview-${viewName}`).classList.remove('hidden');
+
+      document.querySelectorAll('.side-nav-btn').forEach(btn => {
+        if (btn.getAttribute('data-nav') === viewName) {
+          btn.className = 'side-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-[#141518] text-white transition';
+        } else {
+          btn.className = 'side-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-muted hover:text-ink hover:bg-canvas transition';
+        }
+      });
+
+      document.querySelectorAll('.bottom-nav-btn').forEach(btn => {
+        if (btn.getAttribute('data-bnav') === viewName) {
+          btn.className = 'bottom-nav-btn w-full py-1 flex flex-col items-center justify-center text-ink';
+        } else {
+          btn.className = 'bottom-nav-btn w-full py-1 flex flex-col items-center justify-center text-muted';
+        }
+      });
+
+      updateInvoiceTotals();
+      lucide.createIcons();
+    }
+
+    function selectServicePackage(name, desc, duration, serviceCost, partCost) {
+      currentPackage = { name, desc, duration: 'Estimasi ' + duration, service: serviceCost, part: partCost };
+      document.getElementById('pkg-name').textContent = name;
+      document.getElementById('pkg-desc').textContent = desc;
+      document.getElementById('pkg-duration').textContent = 'Estimasi ' + duration;
+      document.getElementById('cost-service').textContent = formatRupiah(serviceCost);
+      document.getElementById('cost-part').textContent = formatRupiah(partCost);
+      document.getElementById('cost-total').textContent = formatRupiah(serviceCost + partCost);
+      navigateCustomer('order');
+    }
+
+    function setProgressStage(stage) {
+      const states = {
+        1: ['Teknisi Menuju Lokasi', '8 Menit'],
+        2: ['Inspeksi Awal Kendaraan', 'Di Lokasi'],
+        3: ['Pengerjaan Servis Berlangsung', '~25 Menit'],
+        4: ['Servis Selesai & Tervalidasi', 'Selesai']
+      };
+      document.getElementById('track-status-title').textContent = states[stage][0];
+      document.getElementById('track-eta-text').textContent = states[stage][1];
+
+      for (let i = 1; i <= 4; i++) {
+        const el = document.getElementById(`stage-btn-${i}`);
+        if (i === stage) {
+          el.className = 'stage-pill p-3 rounded-xl bg-[#141518] text-white text-left transition';
+        } else {
+          el.className = 'stage-pill p-3 rounded-xl bg-canvas hover:bg-[#ECEAE2] text-ink text-left transition';
+        }
+      }
+    }
+
+    function proceedToInvoice(approved) {
+      isBrakePadApproved = approved;
+      navigateCustomer('invoice');
+    }
+
+    function updateInvoiceTotals() {
+      const base = currentPackage.service + currentPackage.part;
+      const extra = isBrakePadApproved ? 35000 : 0;
+      document.getElementById('final-base-cost').textContent = formatRupiah(base);
+      document.getElementById('final-extra-label').textContent = isBrakePadApproved
+        ? 'Biaya Tambahan (Disetujui)'
+        : 'Biaya Tambahan (Ditolak)';
+      document.getElementById('final-extra-cost').textContent = formatRupiah(extra);
+      document.getElementById('final-grand-total').textContent = formatRupiah(base + extra);
+    }
+
+    function rateMechanic(stars) {
+      const captions = {
+        1: 'Skor: 1 / 5 — Kurang Memuaskan',
+        2: 'Skor: 2 / 5 — Perlu Perbaikan',
+        3: 'Skor: 3 / 5 — Cukup Baik',
+        4: 'Skor: 4 / 5 — Puas',
+        5: 'Skor: 5 / 5 — Sangat Puas'
+      };
+      document.getElementById('rating-caption').textContent = captions[stars];
+      document.querySelectorAll('.star-btn').forEach((btn, i) => {
+        if (i < stars) {
+          btn.className = 'star-btn px-3 py-1.5 rounded-lg bg-[#141518] text-amber-400 font-bold text-xs';
+        } else {
+          btn.className = 'star-btn px-3 py-1.5 rounded-lg bg-[#ECEAE2] text-muted font-bold text-xs';
+        }
+      });
+    }
+
+    function toggleChip(btn) {
+      const active = btn.classList.contains('bg-[#141518]');
+      if (active) {
+        btn.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-ink border border-hairline transition';
+      } else {
+        btn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-[#141518] text-white border border-[#141518] transition';
+      }
+    }
+
+    function updateMechanicStatus(statusText, btn) {
+      document.getElementById('mechanic-status-badge').textContent = statusText;
+      document.querySelectorAll('.mech-status-btn').forEach(b => {
+        b.className = 'mech-status-btn py-2.5 px-3 rounded-xl bg-canvas hover:bg-[#ECEAE2] text-ink font-semibold text-xs text-left';
+      });
+      btn.className = 'mech-status-btn py-2.5 px-3 rounded-xl bg-[#141518] text-white font-bold text-xs text-left';
+    }
+  </script>
+</body>
+</html>
