@@ -693,11 +693,14 @@
             <div class="responsive-grid-split grid grid-cols-1 lg:grid-cols-12 gap-5">
               <!-- Kolom Kiri -->
               <div class="lg:col-span-7 space-y-4">
-                <!-- 1. Data Kendaraan -->
+                <!-- 1. Data Kendaraan (ISS-05 / REC-05) -->
                 <div class="card-pad bg-white rounded-2xl p-4 border border-hairline space-y-2.5">
                   <div class="flex items-center justify-between">
                     <h3 class="t-xs font-extrabold uppercase tracking-wider text-muted">1. Data Kendaraan</h3>
-                    <span class="t-xs font-bold text-ink cursor-pointer hover:underline">Ubah</span>
+                    <button type="button" onclick="openVehicleModal()" class="t-xs font-bold text-ink hover:underline flex items-center gap-1">
+                      <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                      <span>Ubah Kendaraan</span>
+                    </button>
                   </div>
                   <div class="flex items-center justify-between bg-canvas p-3.5 rounded-xl border border-hairline gap-2">
                     <div class="flex items-center gap-3 min-w-0">
@@ -705,33 +708,72 @@
                         <i data-lucide="bike" class="w-5 h-5"></i>
                       </div>
                       <div class="min-w-0">
-                        <p class="t-h3 font-bold text-ink truncate">Honda Vario 150 (<span class="font-mono tabular-nums">BE 1234 XX</span>)</p>
-                        <p class="t-xs text-muted">Matic • 2021 • 150cc</p>
+                        <p class="t-h3 font-bold text-ink truncate">
+                          <span id="order-veh-name">Honda Vario 150</span>
+                          (<span id="order-veh-plate" class="font-mono tabular-nums">BE 1234 XX</span>)
+                        </p>
+                        <p id="order-veh-desc" class="t-xs text-muted">Matic • 2021 • 150cc</p>
                       </div>
                     </div>
-                    <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 t-xs font-bold shrink-0">Terpilih</span>
+                    <span id="order-veh-badge" class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 t-xs font-bold shrink-0">Terpilih</span>
                   </div>
                 </div>
 
-                <!-- 2. Titik Lokasi Servis -->
+                <!-- 2. Titik Lokasi Servis (ISS-04 / REC-04) -->
                 <div class="card-pad bg-white rounded-2xl p-4 border border-hairline space-y-3">
-                  <div class="flex items-center justify-between">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
                     <h3 class="t-xs font-extrabold uppercase tracking-wider text-muted">2. Titik Lokasi Servis</h3>
-                    <span class="t-xs font-bold text-ink cursor-pointer hover:underline">Sesuaikan Pin</span>
+                    <div class="flex items-center gap-2">
+                      <button type="button" onclick="openLocationModal()" class="t-xs font-bold text-ink hover:underline flex items-center gap-1">
+                        <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                        <span>Ubah Alamat</span>
+                      </button>
+                      <span class="text-neutral-300">•</span>
+                      <button type="button" onclick="triggerGpsLocate()" class="t-xs font-bold text-forest hover:underline flex items-center gap-1">
+                        <i data-lucide="navigation" class="w-3.5 h-3.5"></i>
+                        <span>Gunakan GPS Saat Ini / Geser Pin</span>
+                      </button>
+                    </div>
                   </div>
 
-                  <div class="h-32 rounded-xl vector-map-bg border border-hairline relative overflow-hidden flex items-center justify-center">
-                    <div class="absolute inset-x-0 top-1/2 h-3 bg-white border-y border-[#DCD9CE] -translate-y-1/2"></div>
-                    <div class="absolute inset-y-0 left-1/3 w-3 bg-white border-x border-[#DCD9CE]"></div>
-                    <div class="relative z-10 flex flex-col items-center">
-                      <span class="bg-[#141518] text-white t-xs font-bold px-3 py-1 rounded-lg shadow-xs">Lokasi Anda (Rajabasa)</span>
-                      <div class="w-3.5 h-3.5 rounded-full bg-emerald-600 border-2 border-white mt-1 shadow-xs"></div>
+                  <!-- Peta Interaktif dengan Draggable / Clickable Pin -->
+                  <div id="interactive-order-map" onclick="moveMapPin(event)" class="h-36 rounded-xl vector-map-bg border border-hairline relative overflow-hidden flex items-center justify-center cursor-crosshair select-none group">
+                    <div class="absolute inset-x-0 top-1/2 h-3 bg-white border-y border-[#DCD9CE] -translate-y-1/2 pointer-events-none"></div>
+                    <div class="absolute inset-y-0 left-1/3 w-3 bg-white border-x border-[#DCD9CE] pointer-events-none"></div>
+                    <div class="absolute inset-y-0 right-1/4 w-2 bg-white/70 border-x border-[#DCD9CE] pointer-events-none"></div>
+
+                    <!-- Badge Status GPS Akurasi -->
+                    <span class="absolute top-2.5 left-2.5 bg-white/95 px-2.5 py-1 rounded-lg border border-hairline t-xs font-bold text-ink shadow-2xs flex items-center gap-1.5 pointer-events-none">
+                      <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse shrink-0"></span>
+                      <span id="map-gps-accuracy">GPS Aktif • Akurasi 3m</span>
+                    </span>
+
+                    <!-- Helper Text Hover -->
+                    <span class="absolute top-2.5 right-2.5 bg-black/70 text-white text-[10px] px-2 py-0.5 rounded shadow pointer-events-none opacity-0 group-hover:opacity-100 transition">
+                      Ketuk peta untuk geser titik pin
+                    </span>
+
+                    <!-- Pin Lokasi Pelanggan (Draggable / Click-to-move) -->
+                    <div id="order-map-pin" style="transform: translate(0px, 0px);" class="relative z-10 flex flex-col items-center transition-all duration-300 pointer-events-none">
+                      <span id="map-pin-label" class="bg-[#141518] text-white text-[11px] font-bold px-2.5 py-0.5 rounded-lg shadow-sm whitespace-nowrap">
+                        Lokasi Anda (Rajabasa)
+                      </span>
+                      <div class="relative flex items-center justify-center mt-1">
+                        <span class="absolute w-7 h-7 rounded-full bg-emerald-500/30 animate-ping"></span>
+                        <div class="w-4 h-4 rounded-full bg-emerald-600 border-2 border-white shadow-md"></div>
+                      </div>
+                    </div>
+
+                    <!-- Koordinat Realtime Bar -->
+                    <div class="absolute bottom-2 inset-x-2.5 bg-white/90 backdrop-blur-xs border border-hairline text-ink px-2.5 py-1 rounded-lg flex items-center justify-between text-[11px] font-mono pointer-events-none">
+                      <span id="map-coords-display">LAT: -5.3789 • LNG: 105.2412</span>
+                      <span class="text-forest font-bold font-sans">Ketuk peta untuk geser pin</span>
                     </div>
                   </div>
 
                   <div class="bg-canvas p-3.5 rounded-xl border border-hairline t-sm space-y-1">
-                    <p class="font-bold text-ink">Jl. ZA Pagar Alam No. 45, Rajabasa, Bandar Lampung</p>
-                    <p class="text-muted">Patokan: <strong class="text-ink">Depan Kosan Biru (Pagar Hitam)</strong></p>
+                    <p id="order-addr-text" class="font-bold text-ink">Jl. ZA Pagar Alam No. 45, Rajabasa, Bandar Lampung</p>
+                    <p class="text-muted">Patokan: <strong id="order-landmark-text" class="text-ink">Depan Kosan Biru (Pagar Hitam)</strong></p>
                   </div>
                 </div>
 
@@ -1503,6 +1545,106 @@
         </div>
       </div>
 
+      <!-- ================================================================= -->
+      <!-- MODAL: KELOLA & PILIH KENDARAAN (ISS-05 / REC-05)                 -->
+      <!-- ================================================================= -->
+      <div id="modal-vehicle" class="hidden absolute inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl border border-hairline shadow-2xl p-5 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto page-enter">
+          <div class="flex items-center justify-between pb-3 border-b border-hairline">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-canvas border border-hairline text-ink flex items-center justify-center shrink-0">
+                <i data-lucide="bike" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="t-h3 font-extrabold text-ink">Pilih Unit Kendaraan</h3>
+                <p class="t-xs text-muted">Kelola motor tersimpan atau tambah unit baru</p>
+              </div>
+            </div>
+            <button type="button" onclick="closeVehicleModal()" class="w-8 h-8 rounded-xl bg-canvas hover:bg-neutral-200 text-ink flex items-center justify-center transition">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <!-- Daftar Kendaraan -->
+          <div id="vehicle-list-container" class="space-y-2.5"></div>
+
+          <!-- Accordion Tambah Motor Baru -->
+          <div class="pt-2 border-t border-hairline">
+            <button type="button" onclick="toggleAddVehicleForm()" id="btn-toggle-add-veh" class="w-full py-2 px-3 rounded-xl bg-canvas hover:bg-[#ECEAE2] text-ink font-bold t-xs border border-hairline flex items-center justify-center gap-1.5 transition">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+              <span>Tambah Kendaraan Baru</span>
+            </button>
+
+            <form id="form-add-vehicle" onsubmit="saveNewVehicle(event)" class="hidden mt-3 space-y-3 bg-canvas p-3.5 rounded-2xl border border-hairline">
+              <h4 class="t-xs font-bold text-ink">Daftarkan Motor Baru</h4>
+              <div>
+                <label class="block text-[11px] font-bold text-muted mb-1">Merk & Tipe Motor</label>
+                <input type="text" id="new-veh-name" placeholder="Misal: Honda PCX 160" required class="w-full px-3 py-2 t-xs bg-white border border-hairline rounded-xl text-ink focus:outline-none focus:border-ink" />
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[11px] font-bold text-muted mb-1">Nomor Polisi (Plat)</label>
+                  <input type="text" id="new-veh-plate" placeholder="BE 5555 ZZ" required class="w-full px-3 py-2 t-xs bg-white border border-hairline rounded-xl text-ink font-mono focus:outline-none focus:border-ink" />
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-muted mb-1">Tahun & CC</label>
+                  <input type="text" id="new-veh-desc" placeholder="Matic • 2023 • 160cc" required class="w-full px-3 py-2 t-xs bg-white border border-hairline rounded-xl text-ink focus:outline-none focus:border-ink" />
+                </div>
+              </div>
+              <button type="submit" class="w-full py-2 rounded-xl bg-[#141518] text-white font-bold t-xs transition">
+                Simpan & Pilih Motor Ini
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- MODAL: KELOLA & PILIH ALAMAT LOKASI (ISS-04 / REC-04)             -->
+      <!-- ================================================================= -->
+      <div id="modal-location" class="hidden absolute inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl border border-hairline shadow-2xl p-5 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto page-enter">
+          <div class="flex items-center justify-between pb-3 border-b border-hairline">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center shrink-0">
+                <i data-lucide="map-pin" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="t-h3 font-extrabold text-ink">Pilih Lokasi & Patokan</h3>
+                <p class="t-xs text-muted">Sesuaikan titik kedatangan teknisi</p>
+              </div>
+            </div>
+            <button type="button" onclick="closeLocationModal()" class="w-8 h-8 rounded-xl bg-canvas hover:bg-neutral-200 text-ink flex items-center justify-center transition">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <!-- Daftar Alamat Tersimpan -->
+          <div id="address-list-container" class="space-y-2.5"></div>
+
+          <!-- Form Edit Alamat & Patokan Manual -->
+          <form onsubmit="saveCustomAddress(event)" class="pt-2 border-t border-hairline space-y-3">
+            <h4 class="t-xs font-bold text-ink">Ubah Alamat / Detail Patokan</h4>
+            <div>
+              <label class="block text-[11px] font-bold text-muted mb-1">Alamat Lengkap</label>
+              <textarea id="custom-addr-input" rows="2" class="w-full p-2.5 t-xs bg-canvas border border-hairline rounded-xl text-ink focus:outline-none focus:border-ink" required>Jl. ZA Pagar Alam No. 45, Rajabasa, Bandar Lampung</textarea>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-muted mb-1">Patokan Rumah / Kosan</label>
+              <input type="text" id="custom-landmark-input" value="Depan Kosan Biru (Pagar Hitam)" class="w-full px-3 py-2 t-xs bg-canvas border border-hairline rounded-xl text-ink focus:outline-none focus:border-ink" required />
+            </div>
+            <div class="flex gap-2">
+              <button type="button" onclick="closeLocationModal()" class="flex-1 py-2.5 rounded-xl bg-canvas hover:bg-[#ECEAE2] text-ink font-bold t-xs border border-hairline transition">
+                Batal
+              </button>
+              <button type="submit" class="flex-1 py-2.5 rounded-xl bg-[#141518] hover:bg-neutral-800 text-white font-bold t-xs transition">
+                Terapkan Alamat
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
     </div>
   </main>
 
@@ -1639,6 +1781,191 @@
       part: 65000
     };
     let isBrakePadApproved = false;
+
+    // ISS-05 / REC-05: State Manajemen Kendaraan
+    let vehiclesList = [
+      { id: 'v1', name: 'Honda Vario 150', plate: 'BE 1234 XX', desc: 'Matic • 2021 • 150cc', selected: true },
+      { id: 'v2', name: 'Yamaha NMAX 155', plate: 'BE 4567 YY', desc: 'Matic • 2022 • 155cc', selected: false },
+      { id: 'v3', name: 'Honda Scoopy FI', plate: 'BE 8910 ZZ', desc: 'Matic • 2020 • 110cc', selected: false }
+    ];
+    let activeVehicle = vehiclesList[0];
+
+    // ISS-04 / REC-04: State Manajemen Alamat & Pin
+    let addressesList = [
+      { id: 'a1', title: 'Kosan Biru (Utama)', address: 'Jl. ZA Pagar Alam No. 45, Rajabasa, Bandar Lampung', landmark: 'Depan Kosan Biru (Pagar Hitam)', coords: '-5.3789 • 105.2412', selected: true },
+      { id: 'a2', title: 'Rumah (Kedaton)', address: 'Jl. Teuku Umar No. 12, Kedaton, Bandar Lampung', landmark: 'Samping Swalayan Chandra, Pagar Hijau', coords: '-5.3921 • 105.2530', selected: false },
+      { id: 'a3', title: 'Kampus Unila', address: 'Gedung H Teknik Elektro, Universitas Lampung', landmark: 'Parkiran motor sayap utara gedung H', coords: '-5.3650 • 105.2440', selected: false }
+    ];
+    let activeAddress = addressesList[0];
+
+    function renderVehicleList() {
+      const container = document.getElementById('vehicle-list-container');
+      if (!container) return;
+      container.innerHTML = vehiclesList.map(v => `
+        <div onclick="selectVehicle('${v.id}')" class="p-3 rounded-2xl border ${v.selected ? 'border-[#141518] bg-canvas' : 'border-hairline bg-white hover:bg-canvas'} cursor-pointer flex items-center justify-between gap-2.5 transition">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-xl ${v.selected ? 'bg-[#141518] text-white' : 'bg-canvas text-ink border border-hairline'} flex items-center justify-center shrink-0">
+              <i data-lucide="bike" class="w-4 h-4"></i>
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <p class="t-sm font-bold text-ink truncate">${v.name}</p>
+                <span class="font-mono font-bold text-[11px] px-1.5 py-0.5 rounded ${v.selected ? 'bg-[#141518] text-white' : 'bg-canvas text-ink border border-hairline'}">${v.plate}</span>
+              </div>
+              <p class="t-xs text-muted truncate">${v.desc}</p>
+            </div>
+          </div>
+          ${v.selected ? '<span class="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold shrink-0">Terpilih</span>' : '<span class="text-xs font-bold text-muted shrink-0">Pilih →</span>'}
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function openVehicleModal() {
+      renderVehicleList();
+      const modal = document.getElementById('modal-vehicle');
+      if (modal) modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeVehicleModal() {
+      const modal = document.getElementById('modal-vehicle');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function selectVehicle(id) {
+      vehiclesList.forEach(v => v.selected = (v.id === id));
+      activeVehicle = vehiclesList.find(v => v.id === id);
+      document.getElementById('order-veh-name').textContent = activeVehicle.name;
+      document.getElementById('order-veh-plate').textContent = activeVehicle.plate;
+      document.getElementById('order-veh-desc').textContent = activeVehicle.desc;
+
+      // Update in home screen as well
+      const homeVehName = document.querySelector('#cview-home h3');
+      const homeVehPlate = document.querySelector('#cview-home span.font-mono');
+      if (homeVehName) homeVehName.textContent = activeVehicle.name;
+      if (homeVehPlate) homeVehPlate.textContent = activeVehicle.plate;
+
+      closeVehicleModal();
+      showToast('Kendaraan berhasil diubah ke: ' + activeVehicle.name, 'success');
+    }
+
+    function toggleAddVehicleForm() {
+      const form = document.getElementById('form-add-vehicle');
+      const btn = document.getElementById('btn-toggle-add-veh');
+      if (form.classList.contains('hidden')) {
+        form.classList.remove('hidden');
+        btn.innerHTML = '<i data-lucide="minus" class="w-3.5 h-3.5"></i><span>Tutup Form Tambah</span>';
+      } else {
+        form.classList.add('hidden');
+        btn.innerHTML = '<i data-lucide="plus" class="w-3.5 h-3.5"></i><span>Tambah Kendaraan Baru</span>';
+      }
+      lucide.createIcons();
+    }
+
+    function saveNewVehicle(e) {
+      e.preventDefault();
+      const name = document.getElementById('new-veh-name').value.trim();
+      const plate = document.getElementById('new-veh-plate').value.trim().toUpperCase();
+      const desc = document.getElementById('new-veh-desc').value.trim();
+      const newV = { id: 'v' + (vehiclesList.length + 1), name, plate, desc, selected: true };
+      vehiclesList.forEach(v => v.selected = false);
+      vehiclesList.push(newV);
+      activeVehicle = newV;
+
+      document.getElementById('order-veh-name').textContent = activeVehicle.name;
+      document.getElementById('order-veh-plate').textContent = activeVehicle.plate;
+      document.getElementById('order-veh-desc').textContent = activeVehicle.desc;
+
+      document.getElementById('form-add-vehicle').reset();
+      toggleAddVehicleForm();
+      closeVehicleModal();
+      showToast('Kendaraan baru ' + name + ' (' + plate + ') berhasil disimpan!', 'success');
+    }
+
+    function renderAddressList() {
+      const container = document.getElementById('address-list-container');
+      if (!container) return;
+      container.innerHTML = addressesList.map(a => `
+        <div onclick="selectAddress('${a.id}')" class="p-3 rounded-2xl border ${a.selected ? 'border-[#141518] bg-canvas' : 'border-hairline bg-white hover:bg-canvas'} cursor-pointer flex items-center justify-between gap-2.5 transition">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="t-xs font-bold text-ink">${a.title}</span>
+              ${a.selected ? '<span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-900 text-[10px] font-bold">Aktif</span>' : ''}
+            </div>
+            <p class="t-xs text-muted truncate mt-0.5">${a.address}</p>
+            <p class="text-[11px] text-muted italic">Patokan: ${a.landmark}</p>
+          </div>
+          <span class="text-xs font-bold text-muted shrink-0">${a.selected ? '✓' : 'Pilih →'}</span>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function openLocationModal() {
+      renderAddressList();
+      const modal = document.getElementById('modal-location');
+      if (modal) {
+        document.getElementById('custom-addr-input').value = activeAddress.address;
+        document.getElementById('custom-landmark-input').value = activeAddress.landmark;
+        modal.classList.remove('hidden');
+        lucide.createIcons();
+      }
+    }
+
+    function closeLocationModal() {
+      const modal = document.getElementById('modal-location');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function selectAddress(id) {
+      addressesList.forEach(a => a.selected = (a.id === id));
+      activeAddress = addressesList.find(a => a.id === id);
+      document.getElementById('order-addr-text').textContent = activeAddress.address;
+      document.getElementById('order-landmark-text').textContent = activeAddress.landmark;
+      document.getElementById('map-pin-label').textContent = activeAddress.title;
+      document.getElementById('map-coords-display').textContent = 'LAT/LNG: ' + activeAddress.coords;
+      closeLocationModal();
+      showToast('Lokasi servis diterapkan: ' + activeAddress.title, 'success');
+    }
+
+    function saveCustomAddress(e) {
+      e.preventDefault();
+      const addr = document.getElementById('custom-addr-input').value.trim();
+      const landmark = document.getElementById('custom-landmark-input').value.trim();
+      activeAddress.address = addr;
+      activeAddress.landmark = landmark;
+      document.getElementById('order-addr-text').textContent = addr;
+      document.getElementById('order-landmark-text').textContent = landmark;
+      closeLocationModal();
+      showToast('Alamat dan patokan baru berhasil disimpan!', 'success');
+    }
+
+    function moveMapPin(e) {
+      const map = document.getElementById('interactive-order-map');
+      const pin = document.getElementById('order-map-pin');
+      if (!map || !pin) return;
+
+      const rect = map.getBoundingClientRect();
+      const relX = Math.round(Math.max(-120, Math.min(120, e.clientX - rect.left - rect.width / 2)));
+      const relY = Math.round(Math.max(-40, Math.min(40, e.clientY - rect.top - rect.height / 2)));
+
+      pin.style.transform = `translate(${relX}px, ${relY}px)`;
+
+      const newLat = (-5.3789 + (relY * 0.00015)).toFixed(4);
+      const newLng = (105.2412 + (relX * 0.00015)).toFixed(4);
+      document.getElementById('map-coords-display').textContent = `LAT: ${newLat} • LNG: ${newLng}`;
+      document.getElementById('map-gps-accuracy').textContent = 'Pin Disesuaikan Manual';
+      showToast('Pin digeser ke titik koordinat (' + newLat + ', ' + newLng + ')', 'info');
+    }
+
+    function triggerGpsLocate() {
+      const pin = document.getElementById('order-map-pin');
+      if (pin) pin.style.transform = 'translate(0px, 0px)';
+      document.getElementById('map-coords-display').textContent = 'LAT: -5.3789 • LNG: 105.2412';
+      document.getElementById('map-gps-accuracy').textContent = 'GPS Aktif • Akurasi 2.8m';
+      showToast('Lokasi GPS tersinkronisasi presisi di posisi Anda saat ini', 'success');
+    }
 
     function formatRupiah(amount) {
       return 'Rp ' + amount.toLocaleString('id-ID');
